@@ -1,5 +1,11 @@
 # Progress Log
 
+## Session 7 - Interval Modules (2026-02-04)
+
+### Added
+- [x] **Interval training modules** - Added Perfect Consonances, Imperfect Consonances, and Dissonances cards
+- [x] **Single-note interval exercises** - Each interval is a one-bass-note exercise with key transposition practice
+
 ## Session 6 - UX Defaults and Transposition Hint (2026-02-04)
 
 ### Fixed Issues

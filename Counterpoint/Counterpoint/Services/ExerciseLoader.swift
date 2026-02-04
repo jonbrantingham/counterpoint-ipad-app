@@ -87,6 +87,10 @@ class ExerciseLoader {
         let bassline2 = createBassline2Exercises()
         exercises.append(contentsOf: bassline2)
 
+        // Interval training modules (single bass note)
+        let intervalModules = createIntervalModuleExercises()
+        exercises.append(contentsOf: intervalModules)
+
         return exercises
     }
 
@@ -263,6 +267,36 @@ class ExerciseLoader {
 
         return exercises
     }
+
+    // MARK: - Interval Modules (Single Bass Note)
+
+    private func createIntervalModuleExercises() -> [Exercise] {
+        var exercises: [Exercise] = []
+
+        let bassNote = Note(pitch: Pitch(noteName: .c, octave: 4), duration: .whole, beatPosition: 0)
+        let bassLine = Voice(notes: [bassNote])
+
+        for module in IntervalModule.allModules {
+            for interval in module.intervals {
+                let sopranoPitch = Pitch.fromStaffPosition(bassNote.pitch.staffPosition + (interval.size - 1))
+                let sopranoNote = Note(pitch: sopranoPitch, duration: .whole, beatPosition: 0)
+                let sopranoLine = Voice(notes: [sopranoNote])
+
+                exercises.append(Exercise(
+                    id: "\(module.id)_\(interval.id)",
+                    name: "\(module.name) \(interval.displayName)",
+                    basslineId: module.id,
+                    species: .first,
+                    key: .cMajor,
+                    bassLine: bassLine,
+                    sopranoSolutions: [sopranoLine],
+                    patternName: interval.displayName
+                ))
+            }
+        }
+
+        return exercises
+    }
 }
 
 // MARK: - Bassline Model
@@ -287,4 +321,53 @@ struct Bassline: Identifiable {
             scaleDegrees: [1, 2, 3, 4, 5, 6, 5, 1]
         )
     ]
+}
+
+// MARK: - Interval Module Model
+
+struct IntervalModule: Identifiable {
+    struct IntervalSpec: Identifiable {
+        let id: String
+        let displayName: String
+        let size: Int
+    }
+
+    let id: String
+    let name: String
+    let description: String
+    let intervals: [IntervalSpec]
+
+    static let perfect = IntervalModule(
+        id: "intervals_perfect",
+        name: "Perfect Consonances",
+        description: "P1, P5, P8",
+        intervals: [
+            IntervalSpec(id: "p1", displayName: "P1", size: 1),
+            IntervalSpec(id: "p5", displayName: "P5", size: 5),
+            IntervalSpec(id: "p8", displayName: "P8", size: 8)
+        ]
+    )
+
+    static let imperfect = IntervalModule(
+        id: "intervals_imperfect",
+        name: "Imperfect Consonances",
+        description: "M3, M6",
+        intervals: [
+            IntervalSpec(id: "m3", displayName: "M3", size: 3),
+            IntervalSpec(id: "m6", displayName: "M6", size: 6)
+        ]
+    )
+
+    static let dissonant = IntervalModule(
+        id: "intervals_dissonant",
+        name: "Dissonances",
+        description: "M2, P4, M7",
+        intervals: [
+            IntervalSpec(id: "m2", displayName: "M2", size: 2),
+            IntervalSpec(id: "p4", displayName: "P4", size: 4),
+            IntervalSpec(id: "m7", displayName: "M7", size: 7)
+        ]
+    )
+
+    static let allModules: [IntervalModule] = [perfect, imperfect, dissonant]
 }

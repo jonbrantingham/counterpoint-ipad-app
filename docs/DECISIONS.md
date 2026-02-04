@@ -92,6 +92,12 @@
 - User must study before practicing
 - **Why**: Ensures pattern is seen before recall attempt
 
+### Interval Training Modules
+- Separate cards for Perfect Consonances, Imperfect Consonances, and Dissonances
+- Each exercise uses a single bass note with one target interval
+- Transposition practice steps through keys for the same interval
+- Intervals are diatonic to the major key (no chromatic accidentals in v1)
+
 ### Figured Bass Notation
 - Shows actual intervals from bass to soprano (e.g., "8", "3", "8" for octave-third-octave)
 - Calculated dynamically from transposed notes via `ExerciseViewModel.figuredBass`

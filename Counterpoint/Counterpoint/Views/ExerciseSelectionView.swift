@@ -11,6 +11,7 @@ struct ExerciseSelectionView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @State private var exercises: [Exercise] = []
     @State private var selectedBassline: Bassline?
+    @State private var selectedIntervalModule: IntervalModule?
     @State private var showingQuiz = false
     @State private var currentQuizItem: QuizItem?
 
@@ -40,9 +41,14 @@ struct ExerciseSelectionView: View {
                     // Bassline selection
                     basslineSection
 
+                    // Interval modules
+                    intervalModuleSection
+
                     // Exercises for selected bassline
                     if let bassline = selectedBassline {
                         exerciseList(for: bassline)
+                    } else if let module = selectedIntervalModule {
+                        intervalExerciseList(for: module)
                     }
                 }
                 .padding()
@@ -142,6 +148,33 @@ struct ExerciseSelectionView: View {
                         )
                         .onTapGesture {
                             selectedBassline = bassline
+                            selectedIntervalModule = nil
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var intervalModuleSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Intervals")
+                .font(.headline)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(IntervalModule.allModules) { module in
+                        IntervalModuleCard(
+                            module: module,
+                            isSelected: selectedIntervalModule?.id == module.id,
+                            progress: progressManager.completionPercentage(
+                                for: module.id,
+                                exercises: exercises
+                            )
+                        )
+                        .onTapGesture {
+                            selectedIntervalModule = module
+                            selectedBassline = nil
                         }
                     }
                 }
@@ -170,6 +203,31 @@ struct ExerciseSelectionView: View {
 
             if basslineExercises.isEmpty {
                 Text("No exercises available for this bassline")
+                    .foregroundColor(.secondary)
+                    .padding()
+            }
+        }
+    }
+
+    private func intervalExerciseList(for module: IntervalModule) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(module.name)
+                .font(.headline)
+
+            let moduleExercises = exercises.filter { $0.basslineId == module.id }
+
+            ForEach(moduleExercises) { exercise in
+                ExerciseRow(
+                    exercise: exercise,
+                    progress: progressManager.getProgress(for: exercise.id)
+                )
+                .onTapGesture {
+                    onSelectExercise(exercise)
+                }
+            }
+
+            if moduleExercises.isEmpty {
+                Text("No exercises available for this module")
                     .foregroundColor(.secondary)
                     .padding()
             }
@@ -219,6 +277,46 @@ struct BasslineCard: View {
         }
         .padding()
         .frame(width: 200)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isSelected ? Color.blue.opacity(0.1) : Color(.secondarySystemBackground))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                )
+        )
+    }
+}
+
+// MARK: - Interval Module Card
+
+struct IntervalModuleCard: View {
+    let module: IntervalModule
+    let isSelected: Bool
+    let progress: Double
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(module.name)
+                    .font(.headline)
+                Spacer()
+                if progress >= 1.0 {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                }
+            }
+
+            Text(module.description)
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            ProgressView(value: progress)
+                .progressViewStyle(.linear)
+                .tint(progress >= 1.0 ? .green : .blue)
+        }
+        .padding()
+        .frame(width: 220)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(isSelected ? Color.blue.opacity(0.1) : Color(.secondarySystemBackground))
