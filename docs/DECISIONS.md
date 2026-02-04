@@ -56,6 +56,10 @@
 - Each step up = +1 (D4=1, E4=2, etc.)
 - Negative positions for bass clef notes
 - **Why**: Simplifies transposition and interval calculations
+- **Key reference positions**:
+  - Treble clef bottom line: E4 = position 2
+  - Bass clef bottom line: G2 = position -10 (G=4, octave 2: 4+(2-4)*7 = -10)
+  - Bass clef top line: A3 = position -2 (A=5, octave 3: 5+(3-4)*7 = -2)
 
 ### Octave Numbering
 - Using scientific pitch notation (C4 = middle C)
@@ -84,3 +88,19 @@
 - Fixed sequence per PRD
 - User must study before practicing
 - **Why**: Ensures pattern is seen before recall attempt
+
+### Figured Bass Notation
+- Interval figures (e.g., "8-7-8") displayed between treble and bass staves
+- Parsed from exercise `patternName` field by splitting on "-"
+- **Why**: Helps user understand the interval pattern being practiced
+- **Position**: Centered horizontally above each bass note, vertically between staves
+
+### Staff Size Controls
+- +/- buttons allow scaling from 0.8x to 1.5x
+- Scale factor affects staff line spacing, clef sizes, note sizes proportionally
+- **Why**: Accommodates different iPad sizes and user preferences for touch targets
+- **Default**: 1.0x scale
+
+### Tempo Range
+- Slider range: 30-360 BPM (step: 10)
+- **Why**: Higher tempos (200+ BPM) useful for advanced practice and pattern internalization

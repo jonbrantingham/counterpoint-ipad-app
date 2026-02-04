@@ -1,5 +1,13 @@
 # Known Issues & Incomplete Items
 
+## Fixed in Session 4
+
+- [x] **Bass note positioning off by one** - Fixed G2 position constant from -9 to -10 (correct staff position calculation)
+- [x] **Ghost ledger line above middle bass note** - Fixed bass clef staff position constants (top line A3=-2, bottom line G2=-10)
+- [x] **Max tempo increased** - Changed tempo slider range from 30-120 BPM to 30-360 BPM
+- [x] **Staff size controls** - Added +/- buttons for dynamic staff scaling (0.8x to 1.5x)
+- [x] **Figured bass notation** - Added interval figures (e.g., "8-7-8") displayed above bass notes between staves
+
 ## Fixed in Session 3
 
 - [x] **SMuFL font integration** - Now using Bravura font for professional music notation
@@ -27,7 +35,7 @@
 - [ ] iOS Simulator audio warnings (EcammAudioLoader, HALC_ProxyIOContext) are normal and don't affect functionality
 
 ### Notation Rendering
-- [ ] Ledger line logic may be incorrect for extreme pitches
+- [ ] Ledger line logic may need testing for extreme pitches (very high/low notes)
 - [ ] No accidentals display on individual notes (all notes assumed diatonic to key)
 - [ ] SMuFL glyph positioning may need fine-tuning for some edge cases
 

@@ -16,15 +16,23 @@ struct GrandStaffView: View {
     let key: Key
     let showSoprano: Bool
     let onTapPosition: ((Int, Pitch) -> Void)?  // (beatIndex, pitch)
+    var scale: CGFloat = 1.0  // Scale factor for staff size (0.8 to 1.5)
+    var figuredBass: [String]? = nil  // Optional figured bass notation (e.g., ["8", "7", "8"])
 
-    // Layout constants - increased for better touch targets
-    private let staffLineSpacing: CGFloat = 16  // Increased from 12 for larger touch targets
+    // Layout constants - base values before scaling
+    private let baseStaffLineSpacing: CGFloat = 16  // Base spacing for touch targets
     private let staffLineCount = 5
-    private let staffGap: CGFloat = 70  // Gap between treble and bass staves
-    private let clefWidth: CGFloat = 50
-    private let keySignatureWidth: CGFloat = 50
+    private let baseStaffGap: CGFloat = 70  // Gap between treble and bass staves
+    private let baseClefWidth: CGFloat = 50
+    private let baseKeySignatureWidth: CGFloat = 50
     private let leftMargin: CGFloat = 15
     private let rightMargin: CGFloat = 25
+
+    // Computed scaled values
+    private var staffLineSpacing: CGFloat { baseStaffLineSpacing * scale }
+    private var staffGap: CGFloat { baseStaffGap * scale }
+    private var clefWidth: CGFloat { baseClefWidth * scale }
+    private var keySignatureWidth: CGFloat { baseKeySignatureWidth * scale }
 
     // SMuFL font sizing - the font size should be 4x the staff line spacing
     // per SMuFL specification for proper glyph scaling
@@ -69,6 +77,11 @@ struct GrandStaffView: View {
                         noteSpacing: noteSpacing,
                         in: geometry
                     )
+                }
+
+                // Figured bass notation (above bass notes)
+                if let figures = figuredBass {
+                    figuredBassNotation(figures: figures, noteSpacing: noteSpacing, in: geometry)
                 }
 
                 // Soprano notes (conditionally visible)
@@ -143,6 +156,24 @@ struct GrandStaffView: View {
                 path.addLine(to: CGPoint(x: x, y: bassTop + CGFloat(staffLineCount - 1) * staffLineSpacing))
             }
             .stroke(Color.primary.opacity(0.7), lineWidth: 2)
+        }
+    }
+
+    // MARK: - Figured Bass Notation
+
+    private func figuredBassNotation(figures: [String], noteSpacing: CGFloat, in geometry: GeometryProxy) -> some View {
+        let bassTop = bassStaffTop(in: geometry)
+        // Position figures above the bass staff (between treble and bass)
+        let figureY = bassTop - staffGap / 2
+
+        return ForEach(Array(figures.enumerated()), id: \.offset) { index, figure in
+            Text(figure)
+                .font(.system(size: staffLineSpacing * 1.2, weight: .medium, design: .serif))
+                .foregroundColor(.secondary)
+                .position(
+                    x: noteXPosition(at: index, noteSpacing: noteSpacing),
+                    y: figureY
+                )
         }
     }
 
@@ -248,7 +279,7 @@ struct GrandStaffView: View {
     /// Calculate Y position for a staff position on the bass clef
     private func yPositionForStaffPosition(_ position: Int, bassTop: CGFloat) -> CGFloat {
         let bassBottom = bassTop + CGFloat(staffLineCount - 1) * staffLineSpacing
-        let g2Position = -9  // G2 is on the bottom line of bass clef
+        let g2Position = -10  // G2 is on the bottom line of bass clef (G=4, octave 2: 4+(2-4)*7 = -10)
         return bassBottom - CGFloat(position - g2Position) * (staffLineSpacing / 2)
     }
 
@@ -346,11 +377,13 @@ struct GrandStaffView: View {
             }
         } else {
             // Bass clef positions
-            let staffTopPosition = -5    // A2
-            let staffBottomPosition = -9 // G2
+            // Top line (A3): A=5, octave 3: 5+(3-4)*7 = -2
+            // Bottom line (G2): G=4, octave 2: 4+(2-4)*7 = -10
+            let staffTopPosition = -2    // A3 on top line
+            let staffBottomPosition = -10 // G2 on bottom line
 
             if position >= staffTopPosition + 2 {
-                var linePosition = staffTopPosition + 2  // C4 (middle C)
+                var linePosition = staffTopPosition + 2  // C4 (middle C) = position 0
                 while linePosition <= position {
                     let y = bassTop - CGFloat(linePosition - staffTopPosition) * (staffLineSpacing / 2)
                     ledgerLineYPositions.append(y)
@@ -430,9 +463,10 @@ struct GrandStaffView: View {
             let e4Position = 2
             return trebleBottom - CGFloat(position - e4Position) * (staffLineSpacing / 2)
         } else {
-            // Bass clef: G2 (position -9) is on the bottom line
+            // Bass clef: G2 (position -10) is on the bottom line
+            // G2 = noteIndex 4 (G) + (2-4)*7 = 4 - 14 = -10
             let bassBottom = bassStaffTop(in: geometry) + CGFloat(staffLineCount - 1) * staffLineSpacing
-            let g2Position = -9
+            let g2Position = -10
             return bassBottom - CGFloat(position - g2Position) * (staffLineSpacing / 2)
         }
     }
@@ -455,7 +489,7 @@ struct GrandStaffView: View {
     GrandStaffView(
         bassNotes: [
             Note(pitch: Pitch(noteName: .c, octave: 3), duration: .whole, beatPosition: 0),
-            Note(pitch: Pitch(noteName: .g, octave: 2), duration: .whole, beatPosition: 4),
+            Note(pitch: Pitch(noteName: .g, octave: 3), duration: .whole, beatPosition: 4),
             Note(pitch: Pitch(noteName: .c, octave: 3), duration: .whole, beatPosition: 8)
         ],
         sopranoNotes: [
@@ -466,7 +500,8 @@ struct GrandStaffView: View {
         placedNotes: [],
         key: Key(tonic: .f, accidental: .natural, mode: .major),
         showSoprano: true,
-        onTapPosition: nil
+        onTapPosition: nil,
+        scale: 1.0
     )
     .frame(height: 350)
     .padding()

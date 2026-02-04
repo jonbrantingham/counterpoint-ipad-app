@@ -79,14 +79,16 @@ struct QuizView: View {
                 .font(.headline)
                 .multilineTextAlignment(.center)
 
-            // Show the bass line
+            // Show the bass line with figured bass
             GrandStaffView(
                 bassNotes: viewModel.transposedBass,
                 sopranoNotes: [],
                 placedNotes: [],
                 key: viewModel.currentKey,
                 showSoprano: false,
-                onTapPosition: nil
+                onTapPosition: nil,
+                scale: 1.0,
+                figuredBass: exercise.patternName.components(separatedBy: "-")
             )
             .frame(height: 250)
             .padding()
@@ -123,7 +125,9 @@ struct QuizView: View {
                 showSoprano: false,
                 onTapPosition: { beatIndex, pitch in
                     viewModel.placeNote(pitch: pitch, at: beatIndex)
-                }
+                },
+                scale: 1.0,
+                figuredBass: exercise.patternName.components(separatedBy: "-")
             )
             .frame(height: 250)
 
@@ -190,7 +194,9 @@ struct QuizView: View {
                 placedNotes: [],
                 key: viewModel.currentKey,
                 showSoprano: true,
-                onTapPosition: nil
+                onTapPosition: nil,
+                scale: 1.0,
+                figuredBass: exercise.patternName.components(separatedBy: "-")
             )
             .frame(height: 200)
 

@@ -10,6 +10,7 @@ import SwiftUI
 struct ExerciseView: View {
     @StateObject private var viewModel: ExerciseViewModel
     @EnvironmentObject var audioEngine: AudioEngine
+    @State private var staffScale: CGFloat = 1.0  // Staff size multiplier (0.8 to 1.5)
 
     let onDismiss: () -> Void
     let onComplete: () -> Void
@@ -77,17 +78,46 @@ struct ExerciseView: View {
     }
 
     private var keySelector: some View {
-        HStack(spacing: 8) {
-            Button(action: { viewModel.previousKey() }) {
-                Image(systemName: "chevron.left")
+        HStack(spacing: 16) {
+            // Staff size controls
+            HStack(spacing: 4) {
+                Button(action: {
+                    staffScale = max(0.8, staffScale - 0.1)
+                }) {
+                    Image(systemName: "minus.circle")
+                        .font(.title3)
+                }
+                .disabled(staffScale <= 0.8)
+
+                Text("Size")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Button(action: {
+                    staffScale = min(1.5, staffScale + 0.1)
+                }) {
+                    Image(systemName: "plus.circle")
+                        .font(.title3)
+                }
+                .disabled(staffScale >= 1.5)
             }
 
-            Text(viewModel.currentKey.shortName)
-                .font(.headline)
-                .frame(minWidth: 60)
+            Divider()
+                .frame(height: 24)
 
-            Button(action: { viewModel.nextKey() }) {
-                Image(systemName: "chevron.right")
+            // Key selector
+            HStack(spacing: 8) {
+                Button(action: { viewModel.previousKey() }) {
+                    Image(systemName: "chevron.left")
+                }
+
+                Text(viewModel.currentKey.shortName)
+                    .font(.headline)
+                    .frame(minWidth: 60)
+
+                Button(action: { viewModel.nextKey() }) {
+                    Image(systemName: "chevron.right")
+                }
             }
         }
         .padding(.horizontal)
@@ -95,9 +125,15 @@ struct ExerciseView: View {
 
     // MARK: - Staff Area
 
+    /// Parse figured bass pattern like "8-7-8" into array ["8", "7", "8"]
+    private var figuredBassArray: [String] {
+        viewModel.exercise.patternName.components(separatedBy: "-")
+    }
+
     private func staffArea(in geometry: GeometryProxy) -> some View {
-        // Increased height for larger staff with better touch targets
-        let staffHeight = min(geometry.size.height * 0.65, 450)
+        // Dynamic height based on scale factor
+        let baseHeight: CGFloat = 350
+        let staffHeight = min(geometry.size.height * 0.7, baseHeight * staffScale)
 
         return ZStack {
             GrandStaffView(
@@ -108,7 +144,9 @@ struct ExerciseView: View {
                 showSoprano: viewModel.showSoprano,
                 onTapPosition: viewModel.phase == .practice ? { beatIndex, pitch in
                     viewModel.placeNote(pitch: pitch, at: beatIndex)
-                } : nil
+                } : nil,
+                scale: staffScale,
+                figuredBass: figuredBassArray
             )
             .frame(height: staffHeight)
 
@@ -228,8 +266,8 @@ struct ExerciseView: View {
                 Text("\(Int(viewModel.tempo)) BPM")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                Slider(value: $viewModel.tempo, in: 30...120, step: 5)
-                    .frame(width: 100)
+                Slider(value: $viewModel.tempo, in: 30...360, step: 10)
+                    .frame(width: 120)
             }
         }
     }
