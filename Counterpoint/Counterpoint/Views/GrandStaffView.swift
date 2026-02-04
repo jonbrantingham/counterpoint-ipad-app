@@ -16,8 +16,10 @@ struct GrandStaffView: View {
     let key: Key
     let showSoprano: Bool
     let onTapPosition: ((Int, Pitch) -> Void)?  // (beatIndex, pitch)
-    var scale: CGFloat = 1.0  // Scale factor for staff size (0.8 to 1.5)
+    var scale: CGFloat = 1.0  // Scale factor for staff size (0.8 to 2.0)
     var figuredBass: [String]? = nil  // Optional figured bass notation (e.g., ["8", "7", "8"])
+    var hintNote: Note? = nil  // Optional starting note hint
+    var hintBeatIndex: Int = 0
 
     // Layout constants - base values before scaling
     private let baseStaffLineSpacing: CGFloat = 16  // Base spacing for touch targets
@@ -25,7 +27,7 @@ struct GrandStaffView: View {
     private let baseStaffGap: CGFloat = 70  // Gap between treble and bass staves
     private let baseClefWidth: CGFloat = 50
     private let baseKeySignatureWidth: CGFloat = 50
-    private let leftMargin: CGFloat = 15
+    private let baseLeftMargin: CGFloat = 15
     private let rightMargin: CGFloat = 25
 
     // Computed scaled values
@@ -33,6 +35,12 @@ struct GrandStaffView: View {
     private var staffGap: CGFloat { baseStaffGap * scale }
     private var clefWidth: CGFloat { baseClefWidth * scale }
     private var keySignatureWidth: CGFloat { baseKeySignatureWidth * scale }
+    private var leftMargin: CGFloat {
+        if scale >= 2.0 {
+            return -4  // Slight overhang at largest size
+        }
+        return baseLeftMargin
+    }
 
     // SMuFL font sizing - the font size should be 4x the staff line spacing
     // per SMuFL specification for proper glyph scaling
@@ -82,6 +90,16 @@ struct GrandStaffView: View {
                 // Figured bass notation (above bass notes)
                 if let figures = figuredBass {
                     figuredBassNotation(figures: figures, noteSpacing: noteSpacing, in: geometry)
+                }
+
+                // Starting note hint (light gray)
+                if let hintNote = hintNote {
+                    hintNoteHead(
+                        hintNote,
+                        at: hintBeatIndex,
+                        noteSpacing: noteSpacing,
+                        in: geometry
+                    )
                 }
 
                 // Soprano notes (conditionally visible)
@@ -301,6 +319,23 @@ struct GrandStaffView: View {
         }
     }
 
+    private func hintNoteHead(_ note: Note, at index: Int, noteSpacing: CGFloat, in geometry: GeometryProxy) -> some View {
+        let xPosition = noteXPosition(at: index, noteSpacing: noteSpacing)
+        let yPosition = noteYPosition(for: note.pitch, isBass: false, in: geometry)
+        let hintColor = Color.secondary.opacity(0.4)
+
+        return ZStack {
+            // Ledger lines if needed
+            ledgerLines(for: note.pitch, isBass: false, at: xPosition, in: geometry, color: hintColor)
+
+            // Note head using SMuFL glyph
+            Text(SMuFL.notehead(for: note.duration))
+                .font(.custom(SMuFL.fontName, size: smuflFontSize))
+                .foregroundColor(hintColor)
+                .position(x: xPosition, y: yPosition)
+        }
+    }
+
     private func placedNoteHead(_ placedNote: PlacedNoteDisplay, noteSpacing: CGFloat, in geometry: GeometryProxy) -> some View {
         let xPosition = noteXPosition(at: placedNote.beatIndex, noteSpacing: noteSpacing)
         let yPosition = noteYPosition(for: placedNote.pitch, isBass: false, in: geometry)
@@ -346,7 +381,13 @@ struct GrandStaffView: View {
 
     // MARK: - Ledger Lines
 
-    private func ledgerLines(for pitch: Pitch, isBass: Bool, at xPosition: CGFloat, in geometry: GeometryProxy) -> some View {
+    private func ledgerLines(
+        for pitch: Pitch,
+        isBass: Bool,
+        at xPosition: CGFloat,
+        in geometry: GeometryProxy,
+        color: Color = Color.primary.opacity(0.7)
+    ) -> some View {
         let trebleTop = trebleStaffTop(in: geometry)
         let bassTop = bassStaffTop(in: geometry)
         let staffBottom = { (top: CGFloat) in top + CGFloat(staffLineCount - 1) * staffLineSpacing }
@@ -404,7 +445,7 @@ struct GrandStaffView: View {
                 path.move(to: CGPoint(x: xPosition - ledgerLineWidth / 2, y: y))
                 path.addLine(to: CGPoint(x: xPosition + ledgerLineWidth / 2, y: y))
             }
-            .stroke(Color.primary.opacity(0.7), lineWidth: 1)
+            .stroke(color, lineWidth: 1)
         }
     }
 

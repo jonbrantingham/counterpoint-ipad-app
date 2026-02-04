@@ -101,11 +101,12 @@
 - **Position**: Centered horizontally above each bass note, vertically between staves
 
 ### Staff Size Controls
-- +/- buttons allow scaling from 0.8x to 1.5x
+- +/- buttons allow scaling from 0.8x to 2.0x
 - Scale factor affects staff line spacing, clef sizes, note sizes proportionally
 - **Why**: Accommodates different iPad sizes and user preferences for touch targets
-- **Default**: 1.0x scale
+- **Default**: 2.0x scale
 
 ### Tempo Range
 - Slider range: 30-360 BPM (step: 10)
 - **Why**: Higher tempos (200+ BPM) useful for advanced practice and pattern internalization
+- **Default**: 215 BPM

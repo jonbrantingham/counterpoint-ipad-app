@@ -1,5 +1,12 @@
 # Progress Log
 
+## Session 6 - UX Defaults and Transposition Hint (2026-02-04)
+
+### Fixed Issues
+- [x] **Largest staff size default + larger sizes** - Staff size now defaults to the largest setting with additional size steps
+- [x] **Default tempo set to 215 BPM** - Playback defaults to a faster practice tempo
+- [x] **Next-key starting note hint** - Advancing keys shows the starting soprano note in light gray during practice
+
 ## Session 5 - Transposition Practice Flow (2026-02-04)
 
 ### Fixed Issues

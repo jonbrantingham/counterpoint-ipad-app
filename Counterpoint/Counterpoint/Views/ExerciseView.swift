@@ -10,7 +10,11 @@ import SwiftUI
 struct ExerciseView: View {
     @StateObject private var viewModel: ExerciseViewModel
     @EnvironmentObject var audioEngine: AudioEngine
-    @State private var staffScale: CGFloat = 1.0  // Staff size multiplier (0.8 to 1.5)
+    private let minStaffScale: CGFloat = 0.8
+    private let maxStaffScale: CGFloat = 2.0
+    private let staffScaleStep: CGFloat = 0.1
+
+    @State private var staffScale: CGFloat = 2.0  // Staff size multiplier (0.8 to 2.0)
 
     let onDismiss: () -> Void
     let onComplete: () -> Void
@@ -82,24 +86,24 @@ struct ExerciseView: View {
             // Staff size controls
             HStack(spacing: 4) {
                 Button(action: {
-                    staffScale = max(0.8, staffScale - 0.1)
+                    staffScale = max(minStaffScale, staffScale - staffScaleStep)
                 }) {
                     Image(systemName: "minus.circle")
                         .font(.title3)
                 }
-                .disabled(staffScale <= 0.8)
+                .disabled(staffScale <= minStaffScale)
 
                 Text("Size")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
                 Button(action: {
-                    staffScale = min(1.5, staffScale + 0.1)
+                    staffScale = min(maxStaffScale, staffScale + staffScaleStep)
                 }) {
                     Image(systemName: "plus.circle")
                         .font(.title3)
                 }
-                .disabled(staffScale >= 1.5)
+                .disabled(staffScale >= maxStaffScale)
             }
 
             Divider()
@@ -137,6 +141,7 @@ struct ExerciseView: View {
                 placedNotes: viewModel.placedNotes,
                 key: viewModel.currentKey,
                 showSoprano: viewModel.showSoprano,
+                hintNote: viewModel.startingHintNote,
                 onTapPosition: viewModel.phase == .practice ? { beatIndex, pitch in
                     viewModel.placeNote(pitch: pitch, at: beatIndex)
                 } : nil,

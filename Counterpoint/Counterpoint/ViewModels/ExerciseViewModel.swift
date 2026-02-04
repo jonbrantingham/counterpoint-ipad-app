@@ -17,6 +17,7 @@ class ExerciseViewModel: ObservableObject {
     @Published var currentKey: Key
     @Published var phase: ExercisePhase = .study
     @Published var showSoprano: Bool = true
+    @Published var showStartingNoteHint: Bool = false
     @Published var placedNotes: [GrandStaffView.PlacedNoteDisplay] = []
     @Published var feedbackMessage: String = ""
     @Published var isComplete: Bool = false
@@ -27,7 +28,7 @@ class ExerciseViewModel: ObservableObject {
     @Published var availableKeys: [Key] = Key.circleOfFourths
 
     // Audio
-    @Published var tempo: Double = 60 {
+    @Published var tempo: Double = 215 {
         didSet {
             audioEngine.setTempo(tempo)
         }
@@ -79,6 +80,12 @@ class ExerciseViewModel: ObservableObject {
         transposeVoice(exercise.primarySoprano, from: exercise.key, to: currentKey).notes
     }
 
+    /// Starting note hint (first soprano note), only shown when enabled
+    var startingHintNote: Note? {
+        guard showStartingNoteHint else { return nil }
+        return transposedSoprano.first
+    }
+
     /// Number of notes the user needs to place
     var noteCount: Int {
         exercise.primarySoprano.notes.count
@@ -115,15 +122,17 @@ class ExerciseViewModel: ObservableObject {
     func startStudy() {
         phase = .study
         showSoprano = true
+        showStartingNoteHint = false
         placedNotes = []
         feedbackMessage = ""
         isComplete = false
     }
 
     /// Begin practice (hide soprano, let user recreate)
-    func startPractice() {
+    func startPractice(showStartingNoteHint: Bool = false) {
         phase = .practice
         showSoprano = false
+        self.showStartingNoteHint = showStartingNoteHint
         placedNotes = []
         correctNotes = 0
         totalAttempts = 0
@@ -163,6 +172,7 @@ class ExerciseViewModel: ObservableObject {
     func placeNote(pitch: Pitch, at beatIndex: Int) {
         guard phase == .practice else { return }
         guard beatIndex < noteCount else { return }
+        showStartingNoteHint = false
 
         // Check if this position already has a correct note
         if let existing = placedNotes.first(where: { $0.beatIndex == beatIndex }),
@@ -213,7 +223,7 @@ class ExerciseViewModel: ObservableObject {
         stopPlayback()  // Stop any current playback
         transpositionIndex = (transpositionIndex + 1) % availableKeys.count
         currentKey = availableKeys[transpositionIndex]
-        startPractice()
+        startPractice(showStartingNoteHint: true)
     }
 
     /// Move to previous key

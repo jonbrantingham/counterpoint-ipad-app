@@ -21,7 +21,7 @@ class AudioEngine: ObservableObject {
 
     @Published var isPlaying = false
     @Published var currentBeat: Int = 0
-    @Published var tempo: Double = 60  // BPM
+    @Published var tempo: Double = 215  // BPM
 
     private var scheduledEvents: [DispatchWorkItem] = []
     private let sampleRate: Double = 44100
