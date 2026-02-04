@@ -1,5 +1,16 @@
 # Known Issues & Incomplete Items
 
+## Fixed in Session 3
+
+- [x] **SMuFL font integration** - Now using Bravura font for professional music notation
+- [x] **Tempo control UI** - Added slider (30-120 BPM) in playback controls
+- [x] **Key signature rendering** - Now shows actual sharps/flats on staff using SMuFL glyphs
+- [x] **Clef symbols** - Now using authentic SMuFL glyphs for treble and bass clefs
+- [x] **Playback on key change** - Playback now stops when changing keys
+- [x] **Note placement accuracy** - Fixed geometry mismatch causing wrong octave placement
+- [x] **Transposition calculation** - Fixed to account for semitone intervals properly
+- [x] **Touch targets** - Increased staff line spacing (16pt) and staff height for better touch input
+
 ## Fixed in Session 2
 
 - [x] **Build errors** - AudioEngine had incorrect method call for loading sound bank
@@ -12,21 +23,18 @@
 ## Remaining Issues
 
 ### Audio
-- [ ] No tempo control UI exposed (backend support added, needs UI slider)
 - [ ] Sound can be abrupt (no attack/release envelope on triangle wave)
 - [ ] iOS Simulator audio warnings (EcammAudioLoader, HALC_ProxyIOContext) are normal and don't affect functionality
 
 ### Notation Rendering
 - [ ] Ledger line logic may be incorrect for extreme pitches
-- [ ] Key signature only shows key name text, not proper sharps/flats on staff
-- [ ] No accidentals display (all notes assumed diatonic to key)
-- [ ] Clef shapes are simplified approximations
+- [ ] No accidentals display on individual notes (all notes assumed diatonic to key)
+- [ ] SMuFL glyph positioning may need fine-tuning for some edge cases
 
 ### Touch Input
 - [ ] No undo gesture for placed notes
 - [ ] Cannot erase/replace correct notes (only incorrect ones fade)
-- [ ] Touch target area may need adjustment for different iPad sizes
-- [ ] Y-position to pitch calculation accuracy not fully tested
+- [ ] Touch target area may need further adjustment for different iPad sizes
 
 ### Exercises
 - [ ] Only 7 exercises total (4 for bassline 1, 3 for bassline 2)
@@ -42,16 +50,14 @@
 - [ ] No app icon designed (placeholder in asset catalog)
 - [ ] No onboarding or tutorial
 - [ ] No settings screen
-- [ ] No tempo control slider in UI
 - [ ] No enharmonic toggle button (e.g., G♭ ↔ F♯)
 - [ ] Completion overlay may overlap with controls on smaller iPads
 
 ## Potential Bugs
 
 1. **ExerciseViewModel audio dependency** - Creates its own `AudioEngine` instance instead of using environment object; may cause audio conflicts
-2. **Transposition calculation** - Simple interval math may not handle all key signatures correctly
-3. **Beat position tracking** - MusicXML parser resets beat position per measure but doesn't track measure numbers
-4. **Memory leak risk** - Timer references in `ExerciseViewModel.fadeTimers` may not be cleaned up properly
+2. **Beat position tracking** - MusicXML parser resets beat position per measure but doesn't track measure numbers
+3. **Memory leak risk** - Timer references in `ExerciseViewModel.fadeTimers` may not be cleaned up properly
 
 ## Technical Debt
 

@@ -96,7 +96,8 @@ struct ExerciseView: View {
     // MARK: - Staff Area
 
     private func staffArea(in geometry: GeometryProxy) -> some View {
-        let staffHeight = min(geometry.size.height * 0.6, 400)
+        // Increased height for larger staff with better touch targets
+        let staffHeight = min(geometry.size.height * 0.65, 450)
 
         return ZStack {
             GrandStaffView(

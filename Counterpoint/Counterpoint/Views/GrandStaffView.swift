@@ -2,7 +2,9 @@
 //  GrandStaffView.swift
 //  Counterpoint
 //
-//  Renders a grand staff with treble and bass clefs
+//  Renders a grand staff with treble and bass clefs using SMuFL-compliant fonts
+//  https://www.smufl.org/
+//  https://w3c.github.io/smufl/latest/index.html
 //
 
 import SwiftUI
@@ -15,14 +17,18 @@ struct GrandStaffView: View {
     let showSoprano: Bool
     let onTapPosition: ((Int, Pitch) -> Void)?  // (beatIndex, pitch)
 
-    // Layout constants
-    private let staffLineSpacing: CGFloat = 12
+    // Layout constants - increased for better touch targets
+    private let staffLineSpacing: CGFloat = 16  // Increased from 12 for larger touch targets
     private let staffLineCount = 5
-    private let staffGap: CGFloat = 50  // Gap between treble and bass staves
-    private let noteWidth: CGFloat = 40
-    private let clefWidth: CGFloat = 40
-    private let keySignatureWidth: CGFloat = 30
-    private let leftMargin: CGFloat = 20
+    private let staffGap: CGFloat = 70  // Gap between treble and bass staves
+    private let clefWidth: CGFloat = 50
+    private let keySignatureWidth: CGFloat = 50
+    private let leftMargin: CGFloat = 15
+    private let rightMargin: CGFloat = 25
+
+    // SMuFL font sizing - the font size should be 4x the staff line spacing
+    // per SMuFL specification for proper glyph scaling
+    private var smuflFontSize: CGFloat { staffLineSpacing * 4 }
 
     struct PlacedNoteDisplay: Identifiable {
         let id: UUID
@@ -41,17 +47,17 @@ struct GrandStaffView: View {
     var body: some View {
         GeometryReader { geometry in
             let totalNotes = max(bassNotes.count, sopranoNotes.count, 1)
-            let availableWidth = geometry.size.width - leftMargin - clefWidth - keySignatureWidth - 40
-            let noteSpacing = max(noteWidth, availableWidth / CGFloat(totalNotes))
+            let availableWidth = geometry.size.width - leftMargin - clefWidth - keySignatureWidth - rightMargin
+            let noteSpacing = max(staffLineSpacing * 3, availableWidth / CGFloat(totalNotes))
 
             ZStack {
                 // Staff lines
                 staffLines(in: geometry)
 
-                // Clefs
+                // Clefs (using SMuFL)
                 clefs(in: geometry)
 
-                // Key signature
+                // Key signature (using SMuFL)
                 keySignature(in: geometry)
 
                 // Bass notes (always visible)
@@ -108,9 +114,9 @@ struct GrandStaffView: View {
                 Path { path in
                     let y = trebleTop + CGFloat(line) * staffLineSpacing
                     path.move(to: CGPoint(x: leftMargin, y: y))
-                    path.addLine(to: CGPoint(x: geometry.size.width - leftMargin, y: y))
+                    path.addLine(to: CGPoint(x: geometry.size.width - rightMargin, y: y))
                 }
-                .stroke(Color.primary.opacity(0.6), lineWidth: 1)
+                .stroke(Color.primary.opacity(0.7), lineWidth: 1)
             }
 
             // Bass staff lines
@@ -118,85 +124,91 @@ struct GrandStaffView: View {
                 Path { path in
                     let y = bassTop + CGFloat(line) * staffLineSpacing
                     path.move(to: CGPoint(x: leftMargin, y: y))
-                    path.addLine(to: CGPoint(x: geometry.size.width - leftMargin, y: y))
+                    path.addLine(to: CGPoint(x: geometry.size.width - rightMargin, y: y))
                 }
-                .stroke(Color.primary.opacity(0.6), lineWidth: 1)
+                .stroke(Color.primary.opacity(0.7), lineWidth: 1)
             }
 
-            // Bar lines at start and end
+            // Bar line at start (connecting both staves)
             Path { path in
                 path.move(to: CGPoint(x: leftMargin, y: trebleTop))
                 path.addLine(to: CGPoint(x: leftMargin, y: bassTop + CGFloat(staffLineCount - 1) * staffLineSpacing))
             }
-            .stroke(Color.primary.opacity(0.6), lineWidth: 1)
+            .stroke(Color.primary.opacity(0.7), lineWidth: 1.5)
 
+            // Final bar line at end
             Path { path in
-                let x = geometry.size.width - leftMargin
+                let x = geometry.size.width - rightMargin
                 path.move(to: CGPoint(x: x, y: trebleTop))
                 path.addLine(to: CGPoint(x: x, y: bassTop + CGFloat(staffLineCount - 1) * staffLineSpacing))
             }
-            .stroke(Color.primary.opacity(0.6), lineWidth: 2)
+            .stroke(Color.primary.opacity(0.7), lineWidth: 2)
         }
     }
 
-    // MARK: - Clefs (drawn with paths)
+    // MARK: - Clefs (SMuFL)
 
     private func clefs(in geometry: GeometryProxy) -> some View {
         let trebleTop = trebleStaffTop(in: geometry)
         let bassTop = bassStaffTop(in: geometry)
 
         return ZStack {
-            // Treble clef - G clef wraps around the G line (2nd line from bottom)
-            // The clef extends from below the staff to above
-            TrebleClefShape()
-                .stroke(Color.primary, lineWidth: 2.5)
-                .frame(width: 28, height: staffLineSpacing * 6)
-                .position(x: leftMargin + 20, y: trebleTop + staffLineSpacing * 2.5)
+            // Treble clef (G clef) - baseline is on the G line (2nd line from bottom)
+            // In SMuFL, the G clef's origin point is at the G line
+            Text(SMuFL.gClef)
+                .font(.custom(SMuFL.fontName, size: smuflFontSize))
+                .foregroundColor(.primary)
+                .position(x: leftMargin + 25, y: trebleTop + staffLineSpacing * 3)
 
-            // Bass clef - F clef with dots around the F line (2nd line from top)
-            BassClefShape()
-                .fill(Color.primary)
-                .frame(width: 26, height: staffLineSpacing * 3)
-                .position(x: leftMargin + 18, y: bassTop + staffLineSpacing * 1.5)
+            // Bass clef (F clef) - baseline is on the F line (2nd line from top)
+            // In SMuFL, the F clef's origin point is at the F line
+            Text(SMuFL.fClef)
+                .font(.custom(SMuFL.fontName, size: smuflFontSize))
+                .foregroundColor(.primary)
+                .position(x: leftMargin + 25, y: bassTop + staffLineSpacing)
         }
     }
 
-    // MARK: - Key Signature
+    // MARK: - Key Signature (SMuFL)
 
     private func keySignature(in geometry: GeometryProxy) -> some View {
         let trebleTop = trebleStaffTop(in: geometry)
         let bassTop = bassStaffTop(in: geometry)
-        let baseX = leftMargin + clefWidth + 8
+        let baseX = leftMargin + clefWidth + 5
         let fifths = key.fifths
+        let accidentalSpacing: CGFloat = staffLineSpacing * 0.8
 
-        // Sharps order on treble clef: F C G D A E B (staff positions relative to E4=2)
-        // F5=8, C5=5, G5=11, D5=8, A4=5, E5=9, B4=6 - adjusted for treble
-        let trebleSharpsPositions = [8, 5, 9, 6, 3, 7, 4]  // F C G D A E B on treble staff
-        let bassSharpsPositions = [-2, -5, -1, -4, -7, -3, -6]  // F C G D A E B on bass staff
+        // Sharp positions on staff (relative to staff position system)
+        // Treble: F5, C5, G5, D5, A4, E5, B4
+        let trebleSharpsPositions = [8, 5, 9, 6, 3, 7, 4]
+        // Bass: F3, C3, G3, D3, A2, E3, B2
+        let bassSharpsPositions = [-4, -7, -3, -6, -9, -5, -8]
 
-        // Flats order on treble clef: B E A D G C F
-        let trebleFlatsPositions = [4, 7, 3, 6, 2, 5, 1]  // B E A D G C F on treble staff
-        let bassFlatsPositions = [-6, -3, -7, -4, -8, -5, -9]  // B E A D G C F on bass staff
+        // Flat positions on staff
+        // Treble: B4, E5, A4, D5, G4, C5, F4
+        let trebleFlatsPositions = [4, 7, 3, 6, 2, 5, 1]
+        // Bass: B2, E3, A2, D3, G2, C3, F2
+        let bassFlatsPositions = [-8, -5, -9, -6, -10, -7, -11]
 
         return ZStack {
             if fifths > 0 {
                 // Sharp key signature
                 ForEach(0..<fifths, id: \.self) { index in
                     // Treble clef sharp
-                    SharpShape()
-                        .stroke(Color.primary, lineWidth: 1.5)
-                        .frame(width: 10, height: staffLineSpacing * 2)
+                    Text(SMuFL.accidentalSharp)
+                        .font(.custom(SMuFL.fontName, size: smuflFontSize * 0.7))
+                        .foregroundColor(.primary)
                         .position(
-                            x: baseX + CGFloat(index) * 10,
+                            x: baseX + CGFloat(index) * accidentalSpacing,
                             y: yPositionForStaffPosition(trebleSharpsPositions[index], trebleTop: trebleTop)
                         )
 
                     // Bass clef sharp
-                    SharpShape()
-                        .stroke(Color.primary, lineWidth: 1.5)
-                        .frame(width: 10, height: staffLineSpacing * 2)
+                    Text(SMuFL.accidentalSharp)
+                        .font(.custom(SMuFL.fontName, size: smuflFontSize * 0.7))
+                        .foregroundColor(.primary)
                         .position(
-                            x: baseX + CGFloat(index) * 10,
+                            x: baseX + CGFloat(index) * accidentalSpacing,
                             y: yPositionForStaffPosition(bassSharpsPositions[index], bassTop: bassTop)
                         )
                 }
@@ -205,25 +217,24 @@ struct GrandStaffView: View {
                 let numFlats = abs(fifths)
                 ForEach(0..<numFlats, id: \.self) { index in
                     // Treble clef flat
-                    FlatShape()
-                        .stroke(Color.primary, lineWidth: 1.5)
-                        .frame(width: 8, height: staffLineSpacing * 2)
+                    Text(SMuFL.accidentalFlat)
+                        .font(.custom(SMuFL.fontName, size: smuflFontSize * 0.7))
+                        .foregroundColor(.primary)
                         .position(
-                            x: baseX + CGFloat(index) * 9,
+                            x: baseX + CGFloat(index) * accidentalSpacing,
                             y: yPositionForStaffPosition(trebleFlatsPositions[index], trebleTop: trebleTop)
                         )
 
                     // Bass clef flat
-                    FlatShape()
-                        .stroke(Color.primary, lineWidth: 1.5)
-                        .frame(width: 8, height: staffLineSpacing * 2)
+                    Text(SMuFL.accidentalFlat)
+                        .font(.custom(SMuFL.fontName, size: smuflFontSize * 0.7))
+                        .foregroundColor(.primary)
                         .position(
-                            x: baseX + CGFloat(index) * 9,
+                            x: baseX + CGFloat(index) * accidentalSpacing,
                             y: yPositionForStaffPosition(bassFlatsPositions[index], bassTop: bassTop)
                         )
                 }
             }
-            // C major has no sharps or flats, so nothing is drawn
         }
     }
 
@@ -241,7 +252,7 @@ struct GrandStaffView: View {
         return bassBottom - CGFloat(position - g2Position) * (staffLineSpacing / 2)
     }
 
-    // MARK: - Note Heads
+    // MARK: - Note Heads (SMuFL)
 
     private func noteHead(for note: Note, at index: Int, isBass: Bool, noteSpacing: CGFloat, in geometry: GeometryProxy) -> some View {
         let xPosition = noteXPosition(at: index, noteSpacing: noteSpacing)
@@ -251,10 +262,10 @@ struct GrandStaffView: View {
             // Ledger lines if needed
             ledgerLines(for: note.pitch, isBass: isBass, at: xPosition, in: geometry)
 
-            // Note head (whole note - ellipse with hollow center)
-            WholeNoteShape()
-                .stroke(Color.primary, lineWidth: 1.5)
-                .frame(width: staffLineSpacing * 1.4, height: staffLineSpacing * 0.9)
+            // Note head using SMuFL glyph
+            Text(SMuFL.notehead(for: note.duration))
+                .font(.custom(SMuFL.fontName, size: smuflFontSize))
+                .foregroundColor(.primary)
                 .position(x: xPosition, y: yPosition)
         }
     }
@@ -285,19 +296,19 @@ struct GrandStaffView: View {
             // Ledger lines if needed
             ledgerLines(for: placedNote.pitch, isBass: false, at: xPosition, in: geometry)
 
-            // Note head
-            WholeNoteShape()
-                .stroke(color, lineWidth: 2)
-                .frame(width: staffLineSpacing * 1.4, height: staffLineSpacing * 0.9)
+            // Note head using SMuFL glyph
+            Text(SMuFL.noteheadWhole)
+                .font(.custom(SMuFL.fontName, size: smuflFontSize))
+                .foregroundColor(color)
                 .opacity(opacity)
                 .position(x: xPosition, y: yPosition)
 
             // Show interval for incorrect notes
             if case .incorrect(let interval) = placedNote.state {
                 Text(interval)
-                    .font(.caption2)
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.red)
-                    .position(x: xPosition, y: yPosition - staffLineSpacing * 1.5)
+                    .position(x: xPosition, y: yPosition - staffLineSpacing * 1.8)
             }
         }
     }
@@ -308,29 +319,24 @@ struct GrandStaffView: View {
         let trebleTop = trebleStaffTop(in: geometry)
         let bassTop = bassStaffTop(in: geometry)
         let staffBottom = { (top: CGFloat) in top + CGFloat(staffLineCount - 1) * staffLineSpacing }
+        let ledgerLineWidth: CGFloat = staffLineSpacing * 1.8
 
-        // Calculate staff position relative to middle C
         let position = pitch.staffPosition
-
         var ledgerLineYPositions: [CGFloat] = []
 
         if !isBass {
-            // Treble clef: middle C (position 0) is one ledger line below staff
-            // Treble staff bottom line is E4 (position 2)
-            // Treble staff top line is F5 (position 9)
+            // Treble clef positions
             let staffBottomPosition = 2  // E4
-            let staffTopPosition = 9     // F5
+            let staffTopPosition = 10    // G5
 
             if position <= staffBottomPosition - 2 {
-                // Notes below the staff - need ledger lines
-                var linePosition = staffBottomPosition - 2  // D4
+                var linePosition = staffBottomPosition - 2  // D4 (middle C is C4 = 0)
                 while linePosition >= position {
                     let y = staffBottom(trebleTop) + CGFloat(staffBottomPosition - linePosition) * (staffLineSpacing / 2)
                     ledgerLineYPositions.append(y)
                     linePosition -= 2
                 }
             } else if position >= staffTopPosition + 2 {
-                // Notes above the staff
                 var linePosition = staffTopPosition + 2
                 while linePosition <= position {
                     let y = trebleTop - CGFloat(linePosition - staffTopPosition) * (staffLineSpacing / 2)
@@ -339,22 +345,18 @@ struct GrandStaffView: View {
                 }
             }
         } else {
-            // Bass clef: middle C (position 0) is one ledger line above staff
-            // Bass staff top line is A3 (position -2)
-            // Bass staff bottom line is G2 (position -9)
-            let staffTopPosition = -2    // A3
+            // Bass clef positions
+            let staffTopPosition = -5    // A2
             let staffBottomPosition = -9 // G2
 
             if position >= staffTopPosition + 2 {
-                // Notes above the staff (including middle C)
-                var linePosition = staffTopPosition + 2  // C4
+                var linePosition = staffTopPosition + 2  // C4 (middle C)
                 while linePosition <= position {
                     let y = bassTop - CGFloat(linePosition - staffTopPosition) * (staffLineSpacing / 2)
                     ledgerLineYPositions.append(y)
                     linePosition += 2
                 }
             } else if position <= staffBottomPosition - 2 {
-                // Notes below the staff
                 var linePosition = staffBottomPosition - 2
                 while linePosition >= position {
                     let y = staffBottom(bassTop) + CGFloat(staffBottomPosition - linePosition) * (staffLineSpacing / 2)
@@ -366,10 +368,10 @@ struct GrandStaffView: View {
 
         return ForEach(ledgerLineYPositions, id: \.self) { y in
             Path { path in
-                path.move(to: CGPoint(x: xPosition - 12, y: y))
-                path.addLine(to: CGPoint(x: xPosition + 12, y: y))
+                path.move(to: CGPoint(x: xPosition - ledgerLineWidth / 2, y: y))
+                path.addLine(to: CGPoint(x: xPosition + ledgerLineWidth / 2, y: y))
             }
-            .stroke(Color.primary.opacity(0.6), lineWidth: 1)
+            .stroke(Color.primary.opacity(0.7), lineWidth: 1)
         }
     }
 
@@ -387,16 +389,16 @@ struct GrandStaffView: View {
                     .onEnded { value in
                         let location = value.location
 
-                        // Only respond to taps in the treble staff area (for soprano input)
-                        if location.y >= trebleTop - staffLineSpacing * 3 &&
+                        // Expanded touch area for treble staff (for soprano input)
+                        // Allow touches above and below the staff for ledger line notes
+                        if location.y >= trebleTop - staffLineSpacing * 4 &&
                            location.y <= bassTop - staffGap / 2 {
 
                             // Calculate beat index from x position
-                            let noteStartX = leftMargin + clefWidth + keySignatureWidth + 20
+                            let noteStartX = leftMargin + clefWidth + keySignatureWidth + 10
                             let beatIndex = Int((location.x - noteStartX) / noteSpacing)
 
                             if beatIndex >= 0 && beatIndex < totalNotes {
-                                // Calculate pitch directly using the same geometry
                                 let pitch = pitchFromYPosition(location.y, in: geometry)
                                 onTapPosition?(beatIndex, pitch)
                             }
@@ -416,7 +418,7 @@ struct GrandStaffView: View {
     }
 
     private func noteXPosition(at index: Int, noteSpacing: CGFloat) -> CGFloat {
-        leftMargin + clefWidth + keySignatureWidth + 20 + CGFloat(index) * noteSpacing + noteSpacing / 2
+        leftMargin + clefWidth + keySignatureWidth + 15 + CGFloat(index) * noteSpacing + noteSpacing / 2
     }
 
     private func noteYPosition(for pitch: Pitch, isBass: Bool, in geometry: GeometryProxy) -> CGFloat {
@@ -447,185 +449,13 @@ struct GrandStaffView: View {
     }
 }
 
-// MARK: - Custom Shapes
-
-/// Whole note shape (ellipse)
-struct WholeNoteShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        // Outer ellipse
-        path.addEllipse(in: rect)
-        return path
-    }
-}
-
-/// Treble clef (G clef) shape - more authentic appearance
-struct TrebleClefShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let w = rect.width
-        let h = rect.height
-
-        // The treble clef has several parts:
-        // 1. A vertical line with a curl at bottom
-        // 2. A spiral in the middle that circles around the G line
-        // 3. A curve at the top
-
-        // Start from the bottom curl
-        path.move(to: CGPoint(x: w * 0.45, y: h * 0.98))
-
-        // Bottom curl going left then up
-        path.addCurve(
-            to: CGPoint(x: w * 0.25, y: h * 0.85),
-            control1: CGPoint(x: w * 0.15, y: h * 0.98),
-            control2: CGPoint(x: w * 0.1, y: h * 0.92)
-        )
-
-        // Rising up the left side
-        path.addCurve(
-            to: CGPoint(x: w * 0.55, y: h * 0.55),
-            control1: CGPoint(x: w * 0.35, y: h * 0.75),
-            control2: CGPoint(x: w * 0.3, y: h * 0.62)
-        )
-
-        // The inner spiral around G line (at h * 0.5)
-        path.addCurve(
-            to: CGPoint(x: w * 0.7, y: h * 0.48),
-            control1: CGPoint(x: w * 0.72, y: h * 0.52),
-            control2: CGPoint(x: w * 0.78, y: h * 0.5)
-        )
-
-        // Continue spiral
-        path.addCurve(
-            to: CGPoint(x: w * 0.35, y: h * 0.52),
-            control1: CGPoint(x: w * 0.65, y: h * 0.42),
-            control2: CGPoint(x: w * 0.45, y: h * 0.4)
-        )
-
-        // Complete the inner loop and go up
-        path.addCurve(
-            to: CGPoint(x: w * 0.5, y: h * 0.25),
-            control1: CGPoint(x: w * 0.25, y: h * 0.45),
-            control2: CGPoint(x: w * 0.32, y: h * 0.32)
-        )
-
-        // Top curve
-        path.addCurve(
-            to: CGPoint(x: w * 0.58, y: h * 0.05),
-            control1: CGPoint(x: w * 0.62, y: h * 0.18),
-            control2: CGPoint(x: w * 0.65, y: h * 0.08)
-        )
-
-        // Curve down to form the top ornament
-        path.addCurve(
-            to: CGPoint(x: w * 0.38, y: h * 0.12),
-            control1: CGPoint(x: w * 0.48, y: h * 0.02),
-            control2: CGPoint(x: w * 0.35, y: h * 0.05)
-        )
-
-        return path
-    }
-}
-
-/// Bass clef (F clef) shape - more authentic appearance
-struct BassClefShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let w = rect.width
-        let h = rect.height
-
-        // The bass clef starts with a filled dot on the F line, then curves down
-
-        // Main body - starts thick at top, curves down
-        path.move(to: CGPoint(x: w * 0.35, y: h * 0.08))
-
-        // The head/dot part (filled circle at F line)
-        path.addEllipse(in: CGRect(x: w * 0.08, y: h * 0.02, width: w * 0.28, height: h * 0.22))
-
-        // Main curved body going down from the dot
-        path.move(to: CGPoint(x: w * 0.35, y: h * 0.13))
-        path.addCurve(
-            to: CGPoint(x: w * 0.6, y: h * 0.25),
-            control1: CGPoint(x: w * 0.5, y: h * 0.1),
-            control2: CGPoint(x: w * 0.58, y: h * 0.15)
-        )
-
-        // Curve down and back
-        path.addCurve(
-            to: CGPoint(x: w * 0.2, y: h * 0.85),
-            control1: CGPoint(x: w * 0.7, y: h * 0.45),
-            control2: CGPoint(x: w * 0.5, y: h * 0.75)
-        )
-
-        // Two dots to the right (between 3rd and 4th lines relative to F)
-        let dotSize = w * 0.15
-        path.addEllipse(in: CGRect(x: w * 0.72, y: h * 0.18, width: dotSize, height: dotSize))
-        path.addEllipse(in: CGRect(x: w * 0.72, y: h * 0.42, width: dotSize, height: dotSize))
-
-        return path
-    }
-}
-
-/// Sharp symbol (♯) shape
-struct SharpShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let w = rect.width
-        let h = rect.height
-
-        // Two vertical lines (slightly tilted)
-        path.move(to: CGPoint(x: w * 0.3, y: h * 0.1))
-        path.addLine(to: CGPoint(x: w * 0.35, y: h * 0.9))
-
-        path.move(to: CGPoint(x: w * 0.65, y: h * 0.1))
-        path.addLine(to: CGPoint(x: w * 0.7, y: h * 0.9))
-
-        // Two horizontal lines (thicker, tilted up to the right)
-        path.move(to: CGPoint(x: w * 0.1, y: h * 0.38))
-        path.addLine(to: CGPoint(x: w * 0.9, y: h * 0.28))
-
-        path.move(to: CGPoint(x: w * 0.1, y: h * 0.72))
-        path.addLine(to: CGPoint(x: w * 0.9, y: h * 0.62))
-
-        return path
-    }
-}
-
-/// Flat symbol (♭) shape
-struct FlatShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let w = rect.width
-        let h = rect.height
-
-        // Vertical stem
-        path.move(to: CGPoint(x: w * 0.25, y: h * 0.05))
-        path.addLine(to: CGPoint(x: w * 0.25, y: h * 0.95))
-
-        // The curved part (like a backwards "b")
-        path.move(to: CGPoint(x: w * 0.25, y: h * 0.5))
-        path.addCurve(
-            to: CGPoint(x: w * 0.85, y: h * 0.65),
-            control1: CGPoint(x: w * 0.5, y: h * 0.45),
-            control2: CGPoint(x: w * 0.85, y: h * 0.5)
-        )
-        path.addCurve(
-            to: CGPoint(x: w * 0.25, y: h * 0.95),
-            control1: CGPoint(x: w * 0.85, y: h * 0.85),
-            control2: CGPoint(x: w * 0.5, y: h * 0.95)
-        )
-
-        return path
-    }
-}
-
 // MARK: - Preview
 
 #Preview {
     GrandStaffView(
         bassNotes: [
             Note(pitch: Pitch(noteName: .c, octave: 3), duration: .whole, beatPosition: 0),
-            Note(pitch: Pitch(noteName: .g, octave: 3), duration: .whole, beatPosition: 4),
+            Note(pitch: Pitch(noteName: .g, octave: 2), duration: .whole, beatPosition: 4),
             Note(pitch: Pitch(noteName: .c, octave: 3), duration: .whole, beatPosition: 8)
         ],
         sopranoNotes: [
@@ -634,10 +464,10 @@ struct FlatShape: Shape {
             Note(pitch: Pitch(noteName: .c, octave: 5), duration: .whole, beatPosition: 8)
         ],
         placedNotes: [],
-        key: .cMajor,
+        key: Key(tonic: .f, accidental: .natural, mode: .major),
         showSoprano: true,
         onTapPosition: nil
     )
-    .frame(height: 300)
+    .frame(height: 350)
     .padding()
 }

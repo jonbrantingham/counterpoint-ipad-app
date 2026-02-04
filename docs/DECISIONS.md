@@ -2,6 +2,17 @@
 
 ## Framework Choices
 
+### SMuFL / Bravura Font for Music Notation
+- **Why**: Industry standard for music notation; ensures cross-platform compatibility and proper rendering
+- **Font**: Bravura (reference implementation for SMuFL, SIL Open Font License)
+- **Specification**: https://www.smufl.org/, https://w3c.github.io/smufl/latest/
+- **Tradeoff**: Requires bundling font file (~500KB), depends on font loading
+- **Alternative considered**: Custom Shape drawings (used previously, but looked amateur)
+- **Key codepoints used**:
+  - Clefs: U+E050 (G clef), U+E062 (F clef)
+  - Noteheads: U+E0A2 (whole), U+E0A3 (half), U+E0A4 (black)
+  - Accidentals: U+E260 (flat), U+E262 (sharp)
+
 ### SwiftUI (not UIKit)
 - **Why**: PRD recommended SwiftUI for modern iPad development
 - **Tradeoff**: Less control over low-level touch handling, but simpler code
