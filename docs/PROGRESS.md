@@ -11,6 +11,11 @@
 ### Fixed Issues
 - [x] **GrandStaffView argument order** - Fixed initializer argument order to match Swift's expected parameter sequence
 
+## Session 10 - Build Fix (2026-02-04)
+
+### Fixed Issues
+- [x] **GrandStaffView argument order (scale/hintNote)** - Reordered arguments to satisfy Swift parameter ordering
+
 ## Session 7 - Interval Modules (2026-02-04)
 
 ### Added
