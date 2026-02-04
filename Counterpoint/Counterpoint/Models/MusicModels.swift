@@ -29,6 +29,12 @@ struct Pitch: Equatable, Hashable, Codable {
         return baseNote + (octave + 1) * 12
     }
 
+    /// MIDI note number adjusted for key signature accidentals
+    func midiNote(in key: Key) -> Int {
+        let accidental = key.accidental(for: noteName)
+        return midiNote + accidental.semitoneOffset
+    }
+
     /// Staff position relative to middle C (C4 = 0, D4 = 1, etc.)
     var staffPosition: Int {
         let noteIndex: Int
@@ -174,6 +180,20 @@ struct Key: Equatable, Codable {
         case (.e, .flat, .minor): return -6
         default: return 0
         }
+    }
+
+    /// Key signature accidental for a given note name (diatonic only)
+    func accidental(for noteName: NoteName) -> Accidental {
+        let sharpOrder: [NoteName] = [.f, .c, .g, .d, .a, .e, .b]
+        let flatOrder: [NoteName] = [.b, .e, .a, .d, .g, .c, .f]
+
+        if fifths > 0 {
+            return sharpOrder.prefix(fifths).contains(noteName) ? .sharp : .natural
+        }
+        if fifths < 0 {
+            return flatOrder.prefix(-fifths).contains(noteName) ? .flat : .natural
+        }
+        return .natural
     }
 
     /// Circle of fourths: C-F-B♭-E♭-A♭-D♭-G♭/F♯-B-E-A-D-G

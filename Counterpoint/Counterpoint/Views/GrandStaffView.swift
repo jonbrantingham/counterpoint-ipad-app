@@ -211,13 +211,13 @@ struct GrandStaffView: View {
 
         // Sharp positions on staff (relative to staff position system)
         // Treble: F5, C5, G5, D5, A4, E5, B4
-        let trebleSharpsPositions = [8, 5, 9, 6, 3, 7, 4]
+        let trebleSharpsPositions = [10, 7, 11, 8, 5, 9, 6]
         // Bass: F3, C3, G3, D3, A2, E3, B2
         let bassSharpsPositions = [-4, -7, -3, -6, -9, -5, -8]
 
         // Flat positions on staff
         // Treble: B4, E5, A4, D5, G4, C5, F4
-        let trebleFlatsPositions = [4, 7, 3, 6, 2, 5, 1]
+        let trebleFlatsPositions = [6, 9, 5, 8, 4, 7, 3]
         // Bass: B2, E3, A2, D3, G2, C3, F2
         let bassFlatsPositions = [-8, -5, -9, -6, -10, -7, -11]
 

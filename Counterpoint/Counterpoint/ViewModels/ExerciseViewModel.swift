@@ -146,12 +146,12 @@ class ExerciseViewModel: ObservableObject {
     func playExercise() {
         let bass = Voice(notes: transposedBass)
         let soprano = showSoprano ? Voice(notes: transposedSoprano) : Voice(notes: [])
-        audioEngine.playExercise(bass: bass, soprano: soprano)
+        audioEngine.playExercise(bass: bass, soprano: soprano, key: currentKey)
     }
 
     /// Play just the bass line
     func playBass() {
-        audioEngine.playBassLine(Voice(notes: transposedBass))
+        audioEngine.playBassLine(Voice(notes: transposedBass), key: currentKey)
     }
 
     /// Stop playback
@@ -175,7 +175,7 @@ class ExerciseViewModel: ObservableObject {
 
         // Play feedback
         let bassNote = beatIndex < transposedBass.count ? transposedBass[beatIndex] : nil
-        audioEngine.playTouchFeedback(tappedPitch: pitch, bassNote: bassNote)
+        audioEngine.playTouchFeedback(tappedPitch: pitch, bassNote: bassNote, key: currentKey)
 
         // Check if correct
         let expectedPitch = transposedSoprano[beatIndex].pitch

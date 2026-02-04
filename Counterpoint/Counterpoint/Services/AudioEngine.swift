@@ -96,11 +96,19 @@ class AudioEngine: ObservableObject {
         return 440.0 * pow(2.0, Float(midiNote - 69) / 12.0)
     }
 
+    /// Resolve MIDI note for a pitch with optional key signature
+    private func midiNote(for pitch: Pitch, in key: Key?) -> Int {
+        if let key = key {
+            return pitch.midiNote(in: key)
+        }
+        return pitch.midiNote
+    }
+
     // MARK: - Note Playback
 
     /// Play a single note immediately (for touch feedback)
-    func playNote(_ pitch: Pitch, velocity: UInt8 = 80, duration: Double = 0.3) {
-        let midiNote = pitch.midiNote
+    func playNote(_ pitch: Pitch, key: Key? = nil, velocity: UInt8 = 80, duration: Double = 0.3) {
+        let midiNote = midiNote(for: pitch, in: key)
         startNoteInternal(midiNote: midiNote, velocity: velocity)
 
         // Auto-stop after duration
@@ -110,9 +118,9 @@ class AudioEngine: ObservableObject {
     }
 
     /// Play two notes simultaneously (bass + soprano interval)
-    func playInterval(bass: Pitch, soprano: Pitch, velocity: UInt8 = 80, duration: Double = 0.5) {
-        let bassMidi = bass.midiNote
-        let sopranoMidi = soprano.midiNote
+    func playInterval(bass: Pitch, soprano: Pitch, key: Key? = nil, velocity: UInt8 = 80, duration: Double = 0.5) {
+        let bassMidi = midiNote(for: bass, in: key)
+        let sopranoMidi = midiNote(for: soprano, in: key)
 
         startNoteInternal(midiNote: bassMidi, velocity: velocity)
         startNoteInternal(midiNote: sopranoMidi, velocity: velocity)
@@ -159,13 +167,13 @@ class AudioEngine: ObservableObject {
     }
 
     /// Play a note and sustain until stopNote is called
-    func startNote(_ pitch: Pitch, velocity: UInt8 = 80) {
-        startNoteInternal(midiNote: pitch.midiNote, velocity: velocity)
+    func startNote(_ pitch: Pitch, key: Key? = nil, velocity: UInt8 = 80) {
+        startNoteInternal(midiNote: midiNote(for: pitch, in: key), velocity: velocity)
     }
 
     /// Stop a sustained note
-    func stopNote(_ pitch: Pitch) {
-        stopNoteInternal(midiNote: pitch.midiNote)
+    func stopNote(_ pitch: Pitch, key: Key? = nil) {
+        stopNoteInternal(midiNote: midiNote(for: pitch, in: key))
     }
 
     /// Stop all notes
@@ -178,7 +186,7 @@ class AudioEngine: ObservableObject {
     // MARK: - Exercise Playback
 
     /// Play an entire exercise (both voices)
-    func playExercise(bass: Voice, soprano: Voice, tempo: Double? = nil) {
+    func playExercise(bass: Voice, soprano: Voice, key: Key? = nil, tempo: Double? = nil) {
         guard !isPlaying else { return }
 
         let playbackTempo = tempo ?? self.tempo
@@ -217,14 +225,14 @@ class AudioEngine: ObservableObject {
             // Schedule note on
             let noteOnWork = DispatchWorkItem { [weak self] in
                 guard let self = self, self.isPlaying else { return }
-                self.startNote(event.pitch)
+                self.startNote(event.pitch, key: key)
             }
             scheduledEvents.append(noteOnWork)
             DispatchQueue.main.asyncAfter(deadline: startInstant + event.time, execute: noteOnWork)
 
             // Schedule note off
             let noteOffWork = DispatchWorkItem { [weak self] in
-                self?.stopNote(event.pitch)
+                self?.stopNote(event.pitch, key: key)
             }
             scheduledEvents.append(noteOffWork)
             DispatchQueue.main.asyncAfter(deadline: startInstant + event.time + event.duration, execute: noteOffWork)
@@ -241,8 +249,8 @@ class AudioEngine: ObservableObject {
     }
 
     /// Play just the bass line
-    func playBassLine(_ bass: Voice, tempo: Double? = nil) {
-        playExercise(bass: bass, soprano: Voice(notes: []), tempo: tempo)
+    func playBassLine(_ bass: Voice, key: Key? = nil, tempo: Double? = nil) {
+        playExercise(bass: bass, soprano: Voice(notes: []), key: key, tempo: tempo)
     }
 
     /// Cancel all scheduled playback events
@@ -265,11 +273,11 @@ class AudioEngine: ObservableObject {
 
     /// Play feedback when user taps to place a note
     /// Plays the tapped pitch along with the corresponding bass note
-    func playTouchFeedback(tappedPitch: Pitch, bassNote: Note?) {
+    func playTouchFeedback(tappedPitch: Pitch, bassNote: Note?, key: Key? = nil) {
         if let bass = bassNote {
-            playInterval(bass: bass.pitch, soprano: tappedPitch)
+            playInterval(bass: bass.pitch, soprano: tappedPitch, key: key)
         } else {
-            playNote(tappedPitch)
+            playNote(tappedPitch, key: key)
         }
     }
 

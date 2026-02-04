@@ -66,9 +66,12 @@
 - MIDI note calculation: `(octave + 1) * 12 + noteIndex`
 
 ### Transposition Keys
-- Limited to keys without accidentals in tonic for v1
-- Circle of fourths: C, F, G, D, A, E
-- **Why**: Avoids complexity of Bb, Eb, etc. for initial release
+- Circle of fourths includes naturals and flats: C, F, B♭, E♭, A♭, D♭, G♭/F♯, B, E, A, D, G
+- Enharmonic handling for 6 accidentals
+
+### Key Signature Application
+- Key signatures are drawn using staffPosition mappings for each clef
+- Playback applies key signature accidentals to diatonic notes (no per-note accidentals displayed)
 
 ## UI/UX Decisions
 
