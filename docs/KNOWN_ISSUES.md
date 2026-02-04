@@ -1,5 +1,14 @@
 # Known Issues & Incomplete Items
 
+## Fixed in Session 11
+
+- [x] **Note size too small** - Increased base staff line spacing from 16 to 20 points for better touch accuracy
+- [x] **Clefs pushed off screen** - Fixed leftMargin scaling and increased clef/key signature widths
+- [x] **Db showing as C#** - Changed to use flat notation (5 flats instead of 7 sharps)
+- [x] **Gb showing as F#** - Changed to use flat notation (6 flats instead of 6 sharps)
+- [x] **No enharmonic toggle** - Added tap gesture on key name button to toggle between Db/C# and Gb/F#
+- [x] **Figured bass collision** - Dynamically positions figured bass below staff when bass notes are high
+
 ## Fixed in Session 5
 
 - [x] **Next key starts in practice mode** - Advancing keys now hides the soprano to enforce recall-based transposition
@@ -46,7 +55,6 @@
 ### Touch Input
 - [ ] No undo gesture for placed notes
 - [ ] Cannot erase/replace correct notes (only incorrect ones fade)
-- [ ] Touch target area may need further adjustment for different iPad sizes
 
 ### Exercises
 - [ ] Only 7 exercises total (4 for bassline 1, 3 for bassline 2)
@@ -62,7 +70,6 @@
 - [ ] No app icon designed (placeholder in asset catalog)
 - [ ] No onboarding or tutorial
 - [ ] No settings screen
-- [ ] No enharmonic toggle button (e.g., G♭ ↔ F♯)
 - [ ] Completion overlay may overlap with controls on smaller iPads
 
 ## Potential Bugs

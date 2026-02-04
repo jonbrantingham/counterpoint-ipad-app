@@ -116,9 +116,12 @@ struct ExerciseView: View {
                     Image(systemName: "chevron.left")
                 }
 
-                Text(viewModel.currentKey.shortName)
-                    .font(.headline)
-                    .frame(minWidth: 60)
+                Button(action: { viewModel.toggleEnharmonic() }) {
+                    Text(viewModel.currentKey.shortName)
+                        .font(.headline)
+                        .frame(minWidth: 60)
+                }
+                .disabled(viewModel.currentKey.enharmonicEquivalent() == nil)
 
                 Button(action: { viewModel.nextKey() }) {
                     Image(systemName: "chevron.right")

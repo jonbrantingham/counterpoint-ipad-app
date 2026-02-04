@@ -1,5 +1,15 @@
 # Progress Log
 
+## Session 11 - Touch Targets and Key Signatures (2026-02-04)
+
+### Fixed Issues
+- [x] **Note size increased** - Base staff line spacing increased from 16 to 20 points (~18-20mm at max scale for better touch targeting)
+- [x] **Clef positioning** - Increased clef and key signature widths from 50 to 60 points, fixed leftMargin scaling to prevent clefs being pushed off screen
+- [x] **Db key uses flats** - Changed Db major to use 5 flats instead of 7 sharps (C#)
+- [x] **Gb key uses flats** - Changed Gb major to use 6 flats instead of 6 sharps (F#)
+- [x] **Enharmonic key toggle** - Added ability to tap key name button to toggle between enharmonic equivalents (Db/C#, Gb/F#)
+- [x] **Figured bass collision** - Fixed figured bass positioning to dynamically move below staff when bass notes are high
+
 ## Session 8 - Chromatic Interval Lessons (2026-02-04)
 
 ### Added
@@ -105,10 +115,8 @@
 
 ## Next Up
 
-1. Add tempo control UI (slider or stepper)
-2. Add button to switch enharmonic key spelling (G♭ ↔ F♯)
-3. Verify touch input accuracy on iPad simulator
-4. Add unit tests for core models
-5. Add more exercises for both basslines
-6. Add undo gesture for placed notes
-7. Test on physical iPad device
+1. Verify touch input accuracy on physical iPad device
+2. Add unit tests for core models
+3. Add more exercises for both basslines
+4. Add undo gesture for placed notes
+5. Test B major enharmonic (B/Cb)

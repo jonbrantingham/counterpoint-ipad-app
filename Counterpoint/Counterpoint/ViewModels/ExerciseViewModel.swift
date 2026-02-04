@@ -244,6 +244,29 @@ class ExerciseViewModel: ObservableObject {
         }
     }
 
+    /// Toggle to enharmonic equivalent if available
+    func toggleEnharmonic() {
+        stopPlayback()  // Stop any current playback
+        if let enharmonic = currentKey.enharmonicEquivalent() {
+            currentKey = enharmonic
+            // Update the available keys list to use the new enharmonic
+            if let index = availableKeys.firstIndex(where: {
+                $0.tonic == currentKey.tonic && $0.accidental == currentKey.accidental
+            }) {
+                // Already in the list at this position
+                transpositionIndex = index
+            } else {
+                // Replace the old key with the enharmonic in the list
+                availableKeys[transpositionIndex] = enharmonic
+            }
+            if phase == .practice {
+                startPractice(showStartingNoteHint: showStartingNoteHint)
+            } else {
+                startStudy()
+            }
+        }
+    }
+
     // MARK: - Private Methods
 
     private func scheduleFade(for noteId: UUID) {

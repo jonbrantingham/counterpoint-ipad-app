@@ -186,15 +186,15 @@ struct Key: Equatable, Codable {
         case (.a, .natural, .major): return 3
         case (.e, .natural, .major): return 4
         case (.b, .natural, .major): return 5
-        case (.f, .sharp, .major), (.g, .flat, .major): return 6  // Enharmonic
-        case (.c, .sharp, .major), (.d, .flat, .major): return 7  // Enharmonic (theoretical)
+        case (.f, .sharp, .major): return 6  // F# major (6 sharps)
+        case (.c, .sharp, .major): return 7  // C# major (7 sharps)
         case (.f, .natural, .major): return -1
         case (.b, .flat, .major): return -2
         case (.e, .flat, .major): return -3
         case (.a, .flat, .major): return -4
-        case (.d, .flat, .major): return -5
-        case (.g, .flat, .major): return -6
-        case (.c, .flat, .major): return -7  // Theoretical
+        case (.d, .flat, .major): return -5  // Db major (5 flats)
+        case (.g, .flat, .major): return -6  // Gb major (6 flats)
+        case (.c, .flat, .major): return -7  // Cb major (7 flats, theoretical)
         // Minor keys
         case (.a, .natural, .minor): return 0
         case (.e, .natural, .minor): return 1
