@@ -99,9 +99,11 @@ class ExerciseViewModel: ObservableObject {
 
         for i in 0..<min(bass.count, soprano.count) {
             let interval = Interval.between(bass[i].pitch, soprano[i].pitch)
-            // Use simple interval size (1-8), not compound
+            // Use simple interval size (1-8), not compound.
+            // Display unison as 8 (octave) per figured bass convention in this app.
             let simpleSize = ((interval.size - 1) % 7) + 1
-            figures.append("\(simpleSize)")
+            let displayedSize = (simpleSize == 1) ? 8 : simpleSize
+            figures.append("\(displayedSize)")
         }
 
         return figures
