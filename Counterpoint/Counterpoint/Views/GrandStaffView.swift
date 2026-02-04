@@ -22,12 +22,12 @@ struct GrandStaffView: View {
     var hintBeatIndex: Int = 0
 
     // Layout constants - base values before scaling
-    private let baseStaffLineSpacing: CGFloat = 16  // Base spacing for touch targets
+    private let baseStaffLineSpacing: CGFloat = 20  // Base spacing for touch targets (~18-20mm at max scale)
     private let staffLineCount = 5
     private let baseStaffGap: CGFloat = 70  // Gap between treble and bass staves
-    private let baseClefWidth: CGFloat = 50
-    private let baseKeySignatureWidth: CGFloat = 50
-    private let baseLeftMargin: CGFloat = 15
+    private let baseClefWidth: CGFloat = 60
+    private let baseKeySignatureWidth: CGFloat = 60
+    private let baseLeftMargin: CGFloat = 20
     private let rightMargin: CGFloat = 25
 
     // Computed scaled values
@@ -36,10 +36,8 @@ struct GrandStaffView: View {
     private var clefWidth: CGFloat { baseClefWidth * scale }
     private var keySignatureWidth: CGFloat { baseKeySignatureWidth * scale }
     private var leftMargin: CGFloat {
-        if scale >= 2.0 {
-            return -4  // Slight overhang at largest size
-        }
-        return baseLeftMargin
+        // Scale the left margin to maintain proper spacing
+        return baseLeftMargin * scale
     }
 
     // SMuFL font sizing - the font size should be 4x the staff line spacing
@@ -181,11 +179,19 @@ struct GrandStaffView: View {
 
     private func figuredBassNotation(figures: [String], noteSpacing: CGFloat, in geometry: GeometryProxy) -> some View {
         let bassTop = bassStaffTop(in: geometry)
-        // Position figures above the bass staff (between treble and bass)
-        let figureY = bassTop - staffGap / 2
+        let bassBottom = bassTop + CGFloat(staffLineCount - 1) * staffLineSpacing
 
         return ForEach(Array(figures.enumerated()), id: \.offset) { index, figure in
-            Text(figure)
+            // Check if bass note at this position is above the staff
+            let bassNote = index < bassNotes.count ? bassNotes[index] : nil
+            let bassNoteY = bassNote.map { noteYPosition(for: $0.pitch, isBass: true, in: geometry) }
+
+            // If bass note is above the staff (y < bassTop), place figure below the staff
+            // Otherwise, place it in the middle between staves
+            let isHighBassNote = bassNoteY.map { $0 < bassTop - staffLineSpacing } ?? false
+            let figureY = isHighBassNote ? bassBottom + staffLineSpacing * 2.5 : bassTop - staffGap / 2
+
+            return Text(figure)
                 .font(.system(size: staffLineSpacing * 1.2, weight: .medium, design: .serif))
                 .foregroundColor(.secondary)
                 .position(
