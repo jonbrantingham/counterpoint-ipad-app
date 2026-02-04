@@ -90,9 +90,10 @@
 - **Why**: Ensures pattern is seen before recall attempt
 
 ### Figured Bass Notation
-- Interval figures (e.g., "8-7-8") displayed between treble and bass staves
-- Parsed from exercise `patternName` field by splitting on "-"
-- **Why**: Helps user understand the interval pattern being practiced
+- Shows actual intervals from bass to soprano (e.g., "8", "3", "8" for octave-third-octave)
+- Calculated dynamically from transposed notes via `ExerciseViewModel.figuredBass`
+- **Why**: Helps user understand the harmonic relationship (not just melodic contour)
+- **Note**: Pattern name "8-7-8" refers to soprano scale degrees, but figured bass "8-3-8" shows intervals above bass
 - **Position**: Centered horizontally above each bass note, vertically between staves
 
 ### Staff Size Controls

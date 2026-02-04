@@ -125,11 +125,6 @@ struct ExerciseView: View {
 
     // MARK: - Staff Area
 
-    /// Parse figured bass pattern like "8-7-8" into array ["8", "7", "8"]
-    private var figuredBassArray: [String] {
-        viewModel.exercise.patternName.components(separatedBy: "-")
-    }
-
     private func staffArea(in geometry: GeometryProxy) -> some View {
         // Dynamic height based on scale factor
         let baseHeight: CGFloat = 350
@@ -146,7 +141,7 @@ struct ExerciseView: View {
                     viewModel.placeNote(pitch: pitch, at: beatIndex)
                 } : nil,
                 scale: staffScale,
-                figuredBass: figuredBassArray
+                figuredBass: viewModel.figuredBass
             )
             .frame(height: staffHeight)
 

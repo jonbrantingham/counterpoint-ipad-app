@@ -6,7 +6,7 @@
 - [x] **Ghost ledger line above middle bass note** - Fixed bass clef staff position constants (top line A3=-2, bottom line G2=-10)
 - [x] **Max tempo increased** - Changed tempo slider range from 30-120 BPM to 30-360 BPM
 - [x] **Staff size controls** - Added +/- buttons for dynamic staff scaling (0.8x to 1.5x)
-- [x] **Figured bass notation** - Added interval figures (e.g., "8-7-8") displayed above bass notes between staves
+- [x] **Figured bass notation** - Added true figured bass showing intervals from bass to soprano (e.g., "8-3-8"), calculated dynamically
 
 ## Fixed in Session 3
 

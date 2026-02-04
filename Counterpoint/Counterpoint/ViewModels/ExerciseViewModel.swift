@@ -90,6 +90,23 @@ class ExerciseViewModel: ObservableObject {
         return Double(placedNotes.count) / Double(noteCount)
     }
 
+    /// Figured bass notation - intervals from bass to soprano
+    /// Returns array like ["8", "3", "8"] for octave-third-octave
+    var figuredBass: [String] {
+        let bass = transposedBass
+        let soprano = transposedSoprano
+        var figures: [String] = []
+
+        for i in 0..<min(bass.count, soprano.count) {
+            let interval = Interval.between(bass[i].pitch, soprano[i].pitch)
+            // Use simple interval size (1-8), not compound
+            let simpleSize = ((interval.size - 1) % 7) + 1
+            figures.append("\(simpleSize)")
+        }
+
+        return figures
+    }
+
     // MARK: - Actions
 
     /// Start studying the exercise (show everything)
