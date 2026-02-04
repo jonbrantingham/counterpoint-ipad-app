@@ -1,5 +1,10 @@
 # Progress Log
 
+## Session 5 - Transposition Practice Flow (2026-02-04)
+
+### Fixed Issues
+- [x] **Next key now starts in practice mode** - Advancing to the next key hides the soprano so transposition is recalled from memory
+
 ## Session 2 - Bug Fixes and Improvements (2024-02-04)
 
 ### Fixed Issues

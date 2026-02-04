@@ -1,5 +1,9 @@
 # Known Issues & Incomplete Items
 
+## Fixed in Session 5
+
+- [x] **Next key starts in practice mode** - Advancing keys now hides the soprano to enforce recall-based transposition
+
 ## Fixed in Session 4
 
 - [x] **Bass note positioning off by one** - Fixed G2 position constant from -9 to -10 (correct staff position calculation)

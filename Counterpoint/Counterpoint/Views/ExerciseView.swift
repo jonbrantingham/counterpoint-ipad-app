@@ -176,7 +176,6 @@ struct ExerciseView: View {
 
                 Button("Next Key") {
                     viewModel.nextKey()
-                    viewModel.startStudy()
                 }
                 .buttonStyle(.borderedProminent)
 

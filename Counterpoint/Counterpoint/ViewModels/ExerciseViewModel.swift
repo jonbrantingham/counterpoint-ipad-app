@@ -213,7 +213,7 @@ class ExerciseViewModel: ObservableObject {
         stopPlayback()  // Stop any current playback
         transpositionIndex = (transpositionIndex + 1) % availableKeys.count
         currentKey = availableKeys[transpositionIndex]
-        startStudy()
+        startPractice()
     }
 
     /// Move to previous key
