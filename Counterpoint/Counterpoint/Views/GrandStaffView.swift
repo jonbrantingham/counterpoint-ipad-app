@@ -213,14 +213,14 @@ struct GrandStaffView: View {
             Text(SMuFL.gClef)
                 .font(.custom(SMuFL.fontName, size: smuflFontSize))
                 .foregroundColor(.primary)
-                .position(x: leftMargin + 25, y: trebleTop + staffLineSpacing * 3)
+                .position(x: leftMargin + clefWidth / 2, y: trebleTop + staffLineSpacing * 3)
 
             // Bass clef (F clef) - baseline is on the F line (2nd line from top)
             // In SMuFL, the F clef's origin point is at the F line
             Text(SMuFL.fClef)
                 .font(.custom(SMuFL.fontName, size: smuflFontSize))
                 .foregroundColor(.primary)
-                .position(x: leftMargin + 25, y: bassTop + staffLineSpacing)
+                .position(x: leftMargin + clefWidth / 2, y: bassTop + staffLineSpacing)
         }
     }
 

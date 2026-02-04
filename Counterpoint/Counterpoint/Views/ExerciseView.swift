@@ -11,10 +11,9 @@ struct ExerciseView: View {
     @StateObject private var viewModel: ExerciseViewModel
     @EnvironmentObject var audioEngine: AudioEngine
     private let minStaffScale: CGFloat = 0.8
-    private let maxStaffScale: CGFloat = 2.0
     private let staffScaleStep: CGFloat = 0.1
 
-    @State private var staffScale: CGFloat = 2.0  // Staff size multiplier (0.8 to 2.0)
+    @State private var staffScale: CGFloat = 2.0  // Staff size multiplier (starts at 2.0, no upper limit)
     @State private var accidentalChoice: AccidentalChoice = .key
 
     let onDismiss: () -> Void
@@ -59,15 +58,18 @@ struct ExerciseView: View {
             Button(action: { onDismiss() }) {
                 Image(systemName: "xmark")
                     .font(.title2)
+                    .foregroundColor(.primary)
             }
+            .buttonStyle(.plain)
             .padding()
+            .contentShape(Rectangle())
 
             Spacer()
 
             VStack(spacing: 2) {
                 Text(viewModel.exercise.name)
                     .font(.headline)
-                Text(viewModel.exercise.patternName)
+                Text("Scale degrees: \(viewModel.exercise.patternName)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -94,17 +96,21 @@ struct ExerciseView: View {
                 }
                 .disabled(staffScale <= minStaffScale)
 
-                Text("Size")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                VStack(spacing: 0) {
+                    Text("Size")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    Text(String(format: "%.1f", staffScale))
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                }
 
                 Button(action: {
-                    staffScale = min(maxStaffScale, staffScale + staffScaleStep)
+                    staffScale = staffScale + staffScaleStep
                 }) {
                     Image(systemName: "plus.circle")
                         .font(.title3)
                 }
-                .disabled(staffScale >= maxStaffScale)
             }
 
             Divider()

@@ -115,7 +115,7 @@ class ExerciseLoader {
         ])
         exercises.append(Exercise(
             id: "bassline1_878",
-            name: "Pattern 8-7-8",
+            name: "8-7-8",
             basslineId: "bassline1",
             species: .first,
             key: .cMajor,
@@ -132,7 +132,7 @@ class ExerciseLoader {
         ])
         exercises.append(Exercise(
             id: "bassline1_543",
-            name: "Pattern 5-4-3",
+            name: "5-4-3",
             basslineId: "bassline1",
             species: .first,
             key: .cMajor,
@@ -149,7 +149,7 @@ class ExerciseLoader {
         ])
         exercises.append(Exercise(
             id: "bassline1_323",
-            name: "Pattern 3-2-3",
+            name: "3-2-3",
             basslineId: "bassline1",
             species: .first,
             key: .cMajor,
@@ -166,7 +166,7 @@ class ExerciseLoader {
         ])
         exercises.append(Exercise(
             id: "bassline1_555",
-            name: "Pattern 5-5-5",
+            name: "5-5-5",
             basslineId: "bassline1",
             species: .first,
             key: .cMajor,
