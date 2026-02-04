@@ -147,4 +147,16 @@ extension SMuFL {
             return accidentalFlat
         }
     }
+
+    /// Get the accidental glyph for a note (includes natural)
+    static func noteAccidental(for type: Accidental) -> String {
+        switch type {
+        case .natural:
+            return accidentalNatural
+        case .sharp:
+            return accidentalSharp
+        case .flat:
+            return accidentalFlat
+        }
+    }
 }

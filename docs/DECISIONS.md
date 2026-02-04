@@ -96,7 +96,11 @@
 - Separate cards for Perfect Consonances, Imperfect Consonances, and Dissonances
 - Each exercise uses a single bass note with one target interval
 - Transposition practice steps through keys for the same interval
-- Intervals are diatonic to the major key (no chromatic accidentals in v1)
+ - Core lessons are diatonic to the major key; advanced lessons add chromatic accidentals
+
+### Chromatic Interval Lessons
+- Advanced interval lessons use per-note accidentals (flat/natural/sharp)
+- Accidental picker allows user to place chromatic notes during practice
 
 ### Figured Bass Notation
 - Shows actual intervals from bass to soprano (e.g., "8", "3", "8" for octave-third-octave)

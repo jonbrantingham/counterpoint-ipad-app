@@ -189,7 +189,7 @@ class ExerciseViewModel: ObservableObject {
 
         // Check if correct
         let expectedPitch = transposedSoprano[beatIndex].pitch
-        let isCorrect = pitch == expectedPitch
+        let isCorrect = pitch.matches(expectedPitch, in: currentKey)
 
         totalAttempts += 1
 
@@ -305,7 +305,12 @@ class ExerciseViewModel: ObservableObject {
         // Transpose each note
         let transposedNotes = voice.notes.map { note -> Note in
             let newPosition = note.pitch.staffPosition + staffInterval
-            let newPitch = Pitch.fromStaffPosition(newPosition)
+            let basePitch = Pitch.fromStaffPosition(newPosition)
+            let newPitch = Pitch(
+                noteName: basePitch.noteName,
+                octave: basePitch.octave,
+                accidental: note.pitch.accidental
+            )
             return Note(
                 id: note.id,
                 pitch: newPitch,

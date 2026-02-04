@@ -278,13 +278,25 @@ class ExerciseLoader {
 
         for module in IntervalModule.allModules {
             for interval in module.intervals {
-                let sopranoPitch = Pitch.fromStaffPosition(bassNote.pitch.staffPosition + (interval.size - 1))
+                let basePitch = Pitch.fromStaffPosition(bassNote.pitch.staffPosition + (interval.size - 1))
+                let sopranoPitch = Pitch(
+                    noteName: basePitch.noteName,
+                    octave: basePitch.octave,
+                    accidental: interval.accidental
+                )
                 let sopranoNote = Note(pitch: sopranoPitch, duration: .whole, beatPosition: 0)
                 let sopranoLine = Voice(notes: [sopranoNote])
 
+                let exerciseId: String
+                if interval.isAdvanced {
+                    exerciseId = "\(module.id)_adv_\(interval.id)"
+                } else {
+                    exerciseId = "\(module.id)_\(interval.id)"
+                }
+
                 exercises.append(Exercise(
-                    id: "\(module.id)_\(interval.id)",
-                    name: "\(module.name) \(interval.displayName)",
+                    id: exerciseId,
+                    name: interval.isAdvanced ? "Advanced \(interval.displayName)" : "\(module.name) \(interval.displayName)",
                     basslineId: module.id,
                     species: .first,
                     key: .cMajor,
@@ -330,6 +342,8 @@ struct IntervalModule: Identifiable {
         let id: String
         let displayName: String
         let size: Int
+        let accidental: Accidental?
+        let isAdvanced: Bool
     }
 
     let id: String
@@ -342,9 +356,10 @@ struct IntervalModule: Identifiable {
         name: "Perfect Consonances",
         description: "P1, P5, P8",
         intervals: [
-            IntervalSpec(id: "p1", displayName: "P1", size: 1),
-            IntervalSpec(id: "p5", displayName: "P5", size: 5),
-            IntervalSpec(id: "p8", displayName: "P8", size: 8)
+            IntervalSpec(id: "p1", displayName: "P1", size: 1, accidental: nil, isAdvanced: false),
+            IntervalSpec(id: "p5", displayName: "P5", size: 5, accidental: nil, isAdvanced: false),
+            IntervalSpec(id: "p8", displayName: "P8", size: 8, accidental: nil, isAdvanced: false),
+            IntervalSpec(id: "a1", displayName: "A1", size: 1, accidental: .sharp, isAdvanced: true)
         ]
     )
 
@@ -353,8 +368,10 @@ struct IntervalModule: Identifiable {
         name: "Imperfect Consonances",
         description: "M3, M6",
         intervals: [
-            IntervalSpec(id: "m3", displayName: "M3", size: 3),
-            IntervalSpec(id: "m6", displayName: "M6", size: 6)
+            IntervalSpec(id: "m3", displayName: "M3", size: 3, accidental: nil, isAdvanced: false),
+            IntervalSpec(id: "m6", displayName: "M6", size: 6, accidental: nil, isAdvanced: false),
+            IntervalSpec(id: "m3b", displayName: "m3", size: 3, accidental: .flat, isAdvanced: true),
+            IntervalSpec(id: "m6b", displayName: "m6", size: 6, accidental: .flat, isAdvanced: true)
         ]
     )
 
@@ -363,9 +380,12 @@ struct IntervalModule: Identifiable {
         name: "Dissonances",
         description: "M2, P4, M7",
         intervals: [
-            IntervalSpec(id: "m2", displayName: "M2", size: 2),
-            IntervalSpec(id: "p4", displayName: "P4", size: 4),
-            IntervalSpec(id: "m7", displayName: "M7", size: 7)
+            IntervalSpec(id: "m2", displayName: "M2", size: 2, accidental: nil, isAdvanced: false),
+            IntervalSpec(id: "p4", displayName: "P4", size: 4, accidental: nil, isAdvanced: false),
+            IntervalSpec(id: "m7", displayName: "M7", size: 7, accidental: nil, isAdvanced: false),
+            IntervalSpec(id: "m2b", displayName: "m2", size: 2, accidental: .flat, isAdvanced: true),
+            IntervalSpec(id: "a4", displayName: "A4", size: 4, accidental: .sharp, isAdvanced: true),
+            IntervalSpec(id: "m7b", displayName: "m7", size: 7, accidental: .flat, isAdvanced: true)
         ]
     )
 

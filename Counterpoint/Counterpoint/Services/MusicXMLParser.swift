@@ -183,8 +183,23 @@ class MusicXMLParser: NSObject, XMLParserDelegate {
             if let step = currentPitch.step,
                let octave = currentPitch.octave,
                let noteName = noteNameFromStep(step) {
+                let accidental: Accidental?
+                if let alter = currentPitch.alter {
+                    switch alter {
+                    case -1:
+                        accidental = .flat
+                    case 0:
+                        accidental = .natural
+                    case 1:
+                        accidental = .sharp
+                    default:
+                        accidental = nil
+                    }
+                } else {
+                    accidental = nil
+                }
 
-                let pitch = Pitch(noteName: noteName, octave: octave)
+                let pitch = Pitch(noteName: noteName, octave: octave, accidental: accidental)
                 let duration = durationFromDivisions(currentDuration, divisions: currentDivisions)
                 let note = Note(pitch: pitch, duration: duration, beatPosition: currentBeatPosition)
 

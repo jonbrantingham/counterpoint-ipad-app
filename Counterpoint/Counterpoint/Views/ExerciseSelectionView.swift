@@ -215,14 +215,33 @@ struct ExerciseSelectionView: View {
                 .font(.headline)
 
             let moduleExercises = exercises.filter { $0.basslineId == module.id }
+            let basicExercises = moduleExercises.filter { !$0.id.contains("_adv_") }
+            let advancedExercises = moduleExercises.filter { $0.id.contains("_adv_") }
 
-            ForEach(moduleExercises) { exercise in
+            ForEach(basicExercises) { exercise in
                 ExerciseRow(
                     exercise: exercise,
                     progress: progressManager.getProgress(for: exercise.id)
                 )
                 .onTapGesture {
                     onSelectExercise(exercise)
+                }
+            }
+
+            if !advancedExercises.isEmpty {
+                Text("Advanced")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 4)
+
+                ForEach(advancedExercises) { exercise in
+                    ExerciseRow(
+                        exercise: exercise,
+                        progress: progressManager.getProgress(for: exercise.id)
+                    )
+                    .onTapGesture {
+                        onSelectExercise(exercise)
+                    }
                 }
             }
 

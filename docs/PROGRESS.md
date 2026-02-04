@@ -1,5 +1,11 @@
 # Progress Log
 
+## Session 8 - Chromatic Interval Lessons (2026-02-04)
+
+### Added
+- [x] **Accidental input + rendering** - Added accidental picker and note accidentals (flat/natural/sharp) for practice
+- [x] **Advanced chromatic interval lessons** - Added chromatic lessons within each interval module (shown under Advanced)
+
 ## Session 7 - Interval Modules (2026-02-04)
 
 ### Added

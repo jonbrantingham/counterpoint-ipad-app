@@ -311,6 +311,14 @@ struct GrandStaffView: View {
             // Ledger lines if needed
             ledgerLines(for: note.pitch, isBass: isBass, at: xPosition, in: geometry)
 
+            // Accidental if needed
+            if let accidental = note.pitch.accidental {
+                Text(SMuFL.noteAccidental(for: accidental))
+                    .font(.custom(SMuFL.fontName, size: smuflFontSize * 0.7))
+                    .foregroundColor(.primary)
+                    .position(x: xPosition - staffLineSpacing * 1.2, y: yPosition)
+            }
+
             // Note head using SMuFL glyph
             Text(SMuFL.notehead(for: note.duration))
                 .font(.custom(SMuFL.fontName, size: smuflFontSize))
@@ -327,6 +335,14 @@ struct GrandStaffView: View {
         return ZStack {
             // Ledger lines if needed
             ledgerLines(for: note.pitch, isBass: false, at: xPosition, in: geometry, color: hintColor)
+
+            // Accidental if needed
+            if let accidental = note.pitch.accidental {
+                Text(SMuFL.noteAccidental(for: accidental))
+                    .font(.custom(SMuFL.fontName, size: smuflFontSize * 0.7))
+                    .foregroundColor(hintColor)
+                    .position(x: xPosition - staffLineSpacing * 1.2, y: yPosition)
+            }
 
             // Note head using SMuFL glyph
             Text(SMuFL.notehead(for: note.duration))
@@ -361,6 +377,15 @@ struct GrandStaffView: View {
         return ZStack {
             // Ledger lines if needed
             ledgerLines(for: placedNote.pitch, isBass: false, at: xPosition, in: geometry)
+
+            // Accidental if needed
+            if let accidental = placedNote.pitch.accidental {
+                Text(SMuFL.noteAccidental(for: accidental))
+                    .font(.custom(SMuFL.fontName, size: smuflFontSize * 0.7))
+                    .foregroundColor(color)
+                    .opacity(opacity)
+                    .position(x: xPosition - staffLineSpacing * 1.2, y: yPosition)
+            }
 
             // Note head using SMuFL glyph
             Text(SMuFL.noteheadWhole)

@@ -15,6 +15,7 @@ struct ExerciseView: View {
     private let staffScaleStep: CGFloat = 0.1
 
     @State private var staffScale: CGFloat = 2.0  // Staff size multiplier (0.8 to 2.0)
+    @State private var accidentalChoice: AccidentalChoice = .key
 
     let onDismiss: () -> Void
     let onComplete: () -> Void
@@ -143,7 +144,12 @@ struct ExerciseView: View {
                 showSoprano: viewModel.showSoprano,
                 hintNote: viewModel.startingHintNote,
                 onTapPosition: viewModel.phase == .practice ? { beatIndex, pitch in
-                    viewModel.placeNote(pitch: pitch, at: beatIndex)
+                    let adjustedPitch = Pitch(
+                        noteName: pitch.noteName,
+                        octave: pitch.octave,
+                        accidental: accidentalChoice.accidental
+                    )
+                    viewModel.placeNote(pitch: adjustedPitch, at: beatIndex)
                 } : nil,
                 scale: staffScale,
                 figuredBass: viewModel.figuredBass
@@ -228,6 +234,9 @@ struct ExerciseView: View {
             }
             .padding(.horizontal, 30)
             .padding(.bottom, 20)
+
+            // Accidental controls
+            accidentalControls
         }
         .padding(.top, 12)
         .background(Color(.systemBackground))
@@ -295,6 +304,52 @@ struct ExerciseView: View {
             case .review:
                 EmptyView()
             }
+        }
+    }
+
+    private var accidentalControls: some View {
+        HStack(spacing: 12) {
+            Text("Accidental")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Picker("Accidental", selection: $accidentalChoice) {
+                ForEach(AccidentalChoice.allCases) { choice in
+                    Text(choice.label)
+                        .tag(choice)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(maxWidth: 260)
+        }
+        .padding(.horizontal, 30)
+        .padding(.bottom, 10)
+    }
+}
+
+private enum AccidentalChoice: String, CaseIterable, Identifiable {
+    case key
+    case flat
+    case natural
+    case sharp
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .key: return "Key"
+        case .flat: return "♭"
+        case .natural: return "♮"
+        case .sharp: return "♯"
+        }
+    }
+
+    var accidental: Accidental? {
+        switch self {
+        case .key: return nil
+        case .flat: return .flat
+        case .natural: return .natural
+        case .sharp: return .sharp
         }
     }
 }

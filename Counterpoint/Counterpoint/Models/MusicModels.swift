@@ -13,6 +13,13 @@ import Foundation
 struct Pitch: Equatable, Hashable, Codable {
     let noteName: NoteName
     let octave: Int
+    let accidental: Accidental?
+
+    init(noteName: NoteName, octave: Int, accidental: Accidental? = nil) {
+        self.noteName = noteName
+        self.octave = octave
+        self.accidental = accidental
+    }
 
     /// MIDI note number (C4 = 60)
     var midiNote: Int {
@@ -26,13 +33,24 @@ struct Pitch: Equatable, Hashable, Codable {
         case .a: baseNote = 9
         case .b: baseNote = 11
         }
-        return baseNote + (octave + 1) * 12
+        let accidentalOffset = accidental?.semitoneOffset ?? 0
+        return baseNote + (octave + 1) * 12 + accidentalOffset
     }
 
     /// MIDI note number adjusted for key signature accidentals
     func midiNote(in key: Key) -> Int {
-        let accidental = key.accidental(for: noteName)
-        return midiNote + accidental.semitoneOffset
+        let resolved = accidental ?? key.accidental(for: noteName)
+        let baseNote: Int
+        switch noteName {
+        case .c: baseNote = 0
+        case .d: baseNote = 2
+        case .e: baseNote = 4
+        case .f: baseNote = 5
+        case .g: baseNote = 7
+        case .a: baseNote = 9
+        case .b: baseNote = 11
+        }
+        return baseNote + (octave + 1) * 12 + resolved.semitoneOffset
     }
 
     /// Staff position relative to middle C (C4 = 0, D4 = 1, etc.)
@@ -79,6 +97,18 @@ struct Pitch: Equatable, Hashable, Codable {
         // Apply key signature accidentals
         // For major keys, this is handled by the key's scale degrees
         return newPitch
+    }
+
+    /// Accidental resolved against the current key (nil uses key signature)
+    func resolvedAccidental(in key: Key) -> Accidental {
+        accidental ?? key.accidental(for: noteName)
+    }
+
+    /// Compare two pitches using resolved accidentals in the current key
+    func matches(_ other: Pitch, in key: Key) -> Bool {
+        noteName == other.noteName &&
+        octave == other.octave &&
+        resolvedAccidental(in: key) == other.resolvedAccidental(in: key)
     }
 }
 
