@@ -150,9 +150,9 @@ struct ExerciseView: View {
                     )
                     viewModel.placeNote(pitch: adjustedPitch, at: beatIndex)
                 } : nil,
-                hintNote: viewModel.startingHintNote,
                 scale: staffScale,
-                figuredBass: viewModel.figuredBass
+                figuredBass: viewModel.figuredBass,
+                hintNote: viewModel.startingHintNote
             )
             .frame(height: staffHeight)
 
