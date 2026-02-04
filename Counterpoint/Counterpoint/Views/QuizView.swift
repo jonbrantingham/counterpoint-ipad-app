@@ -115,18 +115,16 @@ struct QuizView: View {
             Text("Recreate the soprano line from memory")
                 .font(.headline)
 
-            GeometryReader { geometry in
-                GrandStaffView(
-                    bassNotes: viewModel.transposedBass,
-                    sopranoNotes: viewModel.transposedSoprano,
-                    placedNotes: viewModel.placedNotes,
-                    key: viewModel.currentKey,
-                    showSoprano: false,
-                    onTapPosition: { beatIndex, yPosition in
-                        handleTap(beatIndex: beatIndex, yPosition: yPosition, in: geometry)
-                    }
-                )
-            }
+            GrandStaffView(
+                bassNotes: viewModel.transposedBass,
+                sopranoNotes: viewModel.transposedSoprano,
+                placedNotes: viewModel.placedNotes,
+                key: viewModel.currentKey,
+                showSoprano: false,
+                onTapPosition: { beatIndex, pitch in
+                    viewModel.placeNote(pitch: pitch, at: beatIndex)
+                }
+            )
             .frame(height: 250)
 
             // Progress
@@ -230,20 +228,6 @@ struct QuizView: View {
     private func playExercise() {
         viewModel.showSoprano = true
         viewModel.playExercise()
-    }
-
-    private func handleTap(beatIndex: Int, yPosition: CGFloat, in geometry: GeometryProxy) {
-        let staffView = GrandStaffView(
-            bassNotes: viewModel.transposedBass,
-            sopranoNotes: viewModel.transposedSoprano,
-            placedNotes: [],
-            key: viewModel.currentKey,
-            showSoprano: false,
-            onTapPosition: nil
-        )
-
-        let pitch = staffView.pitchFromYPosition(yPosition, in: geometry)
-        viewModel.placeNote(pitch: pitch, at: beatIndex)
     }
 
     private func giveUp() {
