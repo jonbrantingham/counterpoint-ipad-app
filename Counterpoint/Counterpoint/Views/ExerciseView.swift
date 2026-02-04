@@ -142,7 +142,6 @@ struct ExerciseView: View {
                 placedNotes: viewModel.placedNotes,
                 key: viewModel.currentKey,
                 showSoprano: viewModel.showSoprano,
-                hintNote: viewModel.startingHintNote,
                 onTapPosition: viewModel.phase == .practice ? { beatIndex, pitch in
                     let adjustedPitch = Pitch(
                         noteName: pitch.noteName,
@@ -151,6 +150,7 @@ struct ExerciseView: View {
                     )
                     viewModel.placeNote(pitch: adjustedPitch, at: beatIndex)
                 } : nil,
+                hintNote: viewModel.startingHintNote,
                 scale: staffScale,
                 figuredBass: viewModel.figuredBass
             )
