@@ -69,8 +69,13 @@ struct ExerciseView: View {
             VStack(spacing: 2) {
                 Text(viewModel.exercise.name)
                     .font(.headline)
+                if !viewModel.figuredBass.isEmpty {
+                    Text("Intervals: \(viewModel.figuredBass.joined(separator: "-"))")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
                 Text("Scale degrees: \(viewModel.exercise.patternName)")
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
 
